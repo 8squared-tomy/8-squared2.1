@@ -16,6 +16,11 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
   const router = useRouter();
   const reload = () => void router.invalidate();
 
+  // LinkedIn / Instagram / Telegram are shown as icons in the footer only, never
+  // as text cards among the club's study resources.
+  const SOCIAL_PLATFORMS = ['linkedin', 'instagram', 'telegram'];
+  const resourceLinks = (links.data ?? []).filter((link) => !SOCIAL_PLATFORMS.includes(link.platform));
+
   const getText = (key: string): string => {
     const entry = content.data?.find((item) => item.key === key);
     return entry ? pick(entry.value_en, entry.value_ar) : '';
@@ -116,10 +121,10 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <h2 className="text-3xl">{t('linksTitle')}</h2>
         <p className="mt-3 max-w-2xl text-muted">{t('linksIntro')}</p>
-        {links.data && links.data.length === 0 && <p className="mt-6 text-muted">{t('emptyLinks')}</p>}
-        {links.data && links.data.length > 0 && (
+        {resourceLinks.length === 0 && <p className="mt-6 text-muted">{t('emptyLinks')}</p>}
+        {resourceLinks.length > 0 && (
           <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {links.data.map((link) => (
+            {resourceLinks.map((link) => (
               <li key={link.id}>
                 <a
                   href={link.url}
