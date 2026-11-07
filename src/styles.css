@@ -2,8 +2,12 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Light theme: warm ivory paper with deep ink and antique gold.
-   Comfortable for long reading — soft background, high but not harsh contrast. */
+/* ---------------------------------------------------------------------------
+   Colour system
+   Base palette: warm ivory paper with deep ink and antique gold.
+   Every board theme below overrides the same tokens, so all components
+   (buttons, cards, header, footer, admin) follow the chosen theme.
+--------------------------------------------------------------------------- */
 :root {
   --app: #f7f3e9;
   --surface: #fffdf8;
@@ -20,6 +24,7 @@
   --danger: #a3291d;
   --success: #14663c;
   --ring: #8a6410;
+  color-scheme: light;
 }
 
 /* Dark theme: near-black lacquer with metallic gold accents. */
@@ -39,12 +44,147 @@
   --danger: #ff9d92;
   --success: #74e2a6;
   --ring: #e6c168;
+  color-scheme: dark;
 }
 
 .contrast {
   --muted: var(--ink);
   --border: var(--ink);
   --surface-2: var(--surface);
+}
+
+/* --- Chess board themes ------------------------------------------------ */
+
+/* Walnut: warm wood board with brass pieces. */
+html[data-board="walnut"] {
+  --app: #f6eee1;
+  --surface: #fffaf2;
+  --surface-2: #ecdfcc;
+  --ink: #241a10;
+  --muted: #6d5a44;
+  --border: #d9c6a9;
+  --gold: #8b5e26;
+  --gold-bright: #a97434;
+  --on-gold: #fffaf0;
+  --cover: #2a1c10;
+  --on-cover: #f7ecdd;
+  --cover-accent: #d8a95f;
+  --ring: #8b5e26;
+}
+
+html.dark[data-board="walnut"] {
+  --app: #14100b;
+  --surface: #1d1710;
+  --surface-2: #272017;
+  --ink: #f4e9d8;
+  --muted: #bda98c;
+  --border: #3a2f22;
+  --gold: #e0b87a;
+  --gold-bright: #f0d3a0;
+  --on-gold: #1a1209;
+  --cover: #0f0b07;
+  --on-cover: #f4e9d8;
+  --cover-accent: #e0b87a;
+  --ring: #e0b87a;
+}
+
+/* Marble: cool stone board with slate-blue pieces. */
+html[data-board="marble"] {
+  --app: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #e8ecf1;
+  --ink: #14181d;
+  --muted: #5b6673;
+  --border: #d3dae2;
+  --gold: #2c4a63;
+  --gold-bright: #3d6383;
+  --on-gold: #f7fafc;
+  --cover: #101820;
+  --on-cover: #eef3f7;
+  --cover-accent: #c9a227;
+  --ring: #2c4a63;
+}
+
+html.dark[data-board="marble"] {
+  --app: #0c0f13;
+  --surface: #141a20;
+  --surface-2: #1c242c;
+  --ink: #e9eef3;
+  --muted: #a3b0bd;
+  --border: #27313b;
+  --gold: #9fc0dd;
+  --gold-bright: #c3dbf0;
+  --on-gold: #0a1016;
+  --cover: #070a0d;
+  --on-cover: #e9eef3;
+  --cover-accent: #9fc0dd;
+  --ring: #9fc0dd;
+}
+
+/* Midnight: royal navy board with silver pieces. */
+html[data-board="midnight"] {
+  --app: #f2f4fb;
+  --surface: #ffffff;
+  --surface-2: #e6eaf7;
+  --ink: #131a2e;
+  --muted: #5a6480;
+  --border: #d2d9ee;
+  --gold: #24336b;
+  --gold-bright: #34478f;
+  --on-gold: #f6f8ff;
+  --cover: #0d1430;
+  --on-cover: #eef1fb;
+  --cover-accent: #e6c168;
+  --ring: #24336b;
+}
+
+html.dark[data-board="midnight"] {
+  --app: #070a16;
+  --surface: #0f1424;
+  --surface-2: #171e33;
+  --ink: #eef1fb;
+  --muted: #a4aec9;
+  --border: #232c47;
+  --gold: #8fa6e8;
+  --gold-bright: #b6c6f7;
+  --on-gold: #0a0f1f;
+  --cover: #04060f;
+  --on-cover: #eef1fb;
+  --cover-accent: #8fa6e8;
+  --ring: #8fa6e8;
+}
+
+/* Emerald: tournament felt with champagne pieces. */
+html[data-board="emerald"] {
+  --app: #f1f7f2;
+  --surface: #ffffff;
+  --surface-2: #e2efe5;
+  --ink: #0f1f16;
+  --muted: #4f6656;
+  --border: #cfe0d4;
+  --gold: #14663c;
+  --gold-bright: #1c7f4c;
+  --on-gold: #f4fbf6;
+  --cover: #0b2418;
+  --on-cover: #eaf6ee;
+  --cover-accent: #d9b45c;
+  --ring: #14663c;
+}
+
+html.dark[data-board="emerald"] {
+  --app: #06120c;
+  --surface: #0d1c14;
+  --surface-2: #14261b;
+  --ink: #e9f4ec;
+  --muted: #9db3a5;
+  --border: #1f3327;
+  --gold: #7fd6a3;
+  --gold-bright: #a5e8bf;
+  --on-gold: #06120c;
+  --cover: #030a06;
+  --on-cover: #e9f4ec;
+  --cover-accent: #7fd6a3;
+  --ring: #7fd6a3;
 }
 
 @theme inline {
@@ -109,14 +249,29 @@ body {
   outline-offset: 2px;
 }
 
+/* Native dropdown lists ignore page colours in some browsers; force readable
+   ink-on-surface so options are never white text on a white panel. */
+select,
+option {
+  background-color: var(--surface);
+  color: var(--ink);
+}
+
 @layer components {
   .card {
     @apply rounded-xl border border-border bg-surface p-6;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 10px 24px -18px rgb(0 0 0 / 0.35);
+    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+  }
+
+  .card-hover:hover {
+    border-color: var(--gold);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 18px 34px -22px rgb(0 0 0 / 0.45);
+    transform: translateY(-2px);
   }
 
   .dark .card {
-    box-shadow: 0 1px 0 rgb(230 193 104 / 0.08), 0 12px 28px rgb(0 0 0 / 0.35);
+    box-shadow: 0 1px 0 rgb(230 193 104 / 0.08), 0 14px 30px rgb(0 0 0 / 0.4);
   }
 
   .input {
@@ -141,6 +296,7 @@ body {
 
   .btn-primary {
     @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-gold px-5 text-sm font-semibold text-on-gold transition-colors;
+    box-shadow: 0 10px 22px -16px rgb(0 0 0 / 0.6);
   }
 
   .btn-primary:hover {
@@ -162,6 +318,93 @@ body {
 
   .btn-ghost:hover {
     background-color: var(--surface-2);
+  }
+
+  /* Selectable option chip: the chosen state inverts to ink-on-app, which stays
+     high contrast in every theme (never white text on a pale background). */
+  .chip {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md border px-3 text-sm font-semibold transition-colors;
+    border-color: var(--border);
+    background-color: var(--surface);
+    color: var(--ink);
+  }
+
+  .chip:hover {
+    border-color: var(--gold);
+  }
+
+  .chip[aria-pressed="true"],
+  .chip[data-active="true"] {
+    border-color: var(--gold);
+    background-color: var(--ink);
+    color: var(--app);
+    box-shadow: inset 0 0 0 1px var(--gold);
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-semibold;
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* Subtle chessboard texture used behind hero / section headers. */
+  .board-pattern {
+    background-image:
+      linear-gradient(
+        45deg,
+        color-mix(in srgb, var(--gold) 10%, transparent) 25%,
+        transparent 25%,
+        transparent 75%,
+        color-mix(in srgb, var(--gold) 10%, transparent) 75%
+      ),
+      linear-gradient(
+        45deg,
+        color-mix(in srgb, var(--gold) 10%, transparent) 25%,
+        transparent 25%,
+        transparent 75%,
+        color-mix(in srgb, var(--gold) 10%, transparent) 75%
+      );
+    background-size: 72px 72px;
+    background-position: 0 0, 36px 36px;
+  }
+
+  .hero-panel {
+    @apply relative overflow-hidden rounded-2xl border;
+    border-color: var(--border);
+    background:
+      radial-gradient(120% 140% at 85% 0%, color-mix(in srgb, var(--cover-accent) 30%, transparent) 0%, transparent 55%),
+      linear-gradient(150deg, var(--cover) 0%, color-mix(in srgb, var(--cover) 82%, #000) 100%);
+    color: var(--on-cover);
+    box-shadow: 0 24px 60px -40px rgb(0 0 0 / 0.9);
+  }
+
+  .section-rule {
+    height: 3px;
+    width: 64px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+  }
+
+  .stat {
+    @apply rounded-lg border px-4 py-3;
+    border-color: var(--border);
+    background-color: var(--surface-2);
+  }
+
+  .theme-swatch {
+    @apply flex flex-col items-center gap-2 rounded-lg border p-2 text-xs font-semibold transition-colors;
+    border-color: var(--border);
+    background-color: var(--surface);
+    color: var(--ink);
+  }
+
+  .theme-swatch:hover {
+    border-color: var(--gold);
+  }
+
+  .theme-swatch[aria-pressed="true"] {
+    border-color: var(--gold);
+    box-shadow: inset 0 0 0 2px var(--gold);
   }
 }
 
