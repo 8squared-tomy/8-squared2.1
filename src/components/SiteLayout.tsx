@@ -14,7 +14,7 @@ export function SiteLayout({ path, children }: { path: string; children: ReactNo
     <div className="flex min-h-screen flex-col bg-app text-ink">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-gold focus:px-4 focus:py-2 focus:text-on-gold"
+        className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[110] focus:rounded-md focus:bg-gold focus:px-4 focus:py-2 focus:text-on-gold"
       >
         {t('skipToContent')}
       </a>
@@ -26,11 +26,10 @@ export function SiteLayout({ path, children }: { path: string; children: ReactNo
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <SiteLogo url={logoUrl} className="h-5 w-5" />
+              <SiteLogo url={logoUrl} className="h-6 w-6" />
               <span className="font-bold text-gold">{t('brand')}</span>
             </div>
             <p className="max-w-sm text-muted">{t('footerTagline')}</p>
-            <SocialLinks />
           </div>
           <nav aria-label={t('footerNav')} className="md:justify-self-end">
             <ul className="grid grid-cols-2 gap-x-8 gap-y-2">
@@ -42,8 +41,14 @@ export function SiteLayout({ path, children }: { path: string; children: ReactNo
             </ul>
           </nav>
         </div>
-        <div className="border-t border-border px-4 py-4 text-center text-sm text-muted sm:px-6">
-          © {year} {t('brand')}. {t('footerRights')}
+        {/* Social platforms live here only, as icons, at the very bottom of the page. */}
+        <div className="border-t border-border px-4 py-5 sm:px-6">
+          <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
+            <p className="text-sm text-muted">
+              © {year} {t('brand')}. {t('footerRights')}
+            </p>
+            <SocialLinks />
+          </div>
         </div>
       </footer>
     </div>
