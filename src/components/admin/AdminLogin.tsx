@@ -4,8 +4,9 @@ import { useLanguage } from '@/i18n/LanguageProvider';
 import { signInAdmin } from '@/lib/admin/auth';
 import { isValidEmail } from '@/lib/validation';
 
-export function AdminLogin({ onSignedIn }: { onSignedIn: () => void }) {
-  const { t } = useLanguage();
+export function AdminLogin({ onSignedIn, denied }: { onSignedIn: () => void; denied?: boolean }) {
+  const { t, language } = useLanguage();
+  const ar = language === 'ar';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [failed, setFailed] = useState(false);
@@ -37,6 +38,13 @@ export function AdminLogin({ onSignedIn }: { onSignedIn: () => void }) {
       <p className="mt-4 text-muted">{t('adminLoginIntro')}</p>
 
       <form onSubmit={handleSubmit} noValidate className="card mt-10 space-y-6">
+        {denied && !failed && (
+          <Notice tone="error">
+            {ar
+              ? 'تم تسجيل الدخول بنجاح، لكن هذا الحساب غير مخوّل للوحة الإدارة. اطلب من مالك النادي منحه دور admin في جدول user_roles.'
+              : 'Signed in successfully, but this account is not authorized for the admin dashboard. Ask the club owner to grant it the admin role in user_roles.'}
+          </Notice>
+        )}
         {failed && <Notice tone="error">{t('adminLoginError')}</Notice>}
         <div className="space-y-2">
           <label htmlFor="admin-email" className="field-label">
