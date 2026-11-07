@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Download, Trash2 } from 'lucide-react';
+import { Download, FileText, Trash2 } from 'lucide-react';
 import { AdminPager } from '@/components/admin/AdminPager';
 import { Notice } from '@/components/FormField';
 import { useLanguage } from '@/i18n/LanguageProvider';
@@ -11,6 +11,7 @@ import {
   updateMembershipStatus,
 } from '@/lib/admin/members';
 import { buildCsv, downloadCsv } from '@/lib/csv';
+import { exportPdfTable } from '@/lib/pdf';
 import { LEVEL_KEYS, MEMBERSHIP_STATUS_KEYS, YEARS_KEYS } from '@/lib/labels';
 import { useAsyncData } from '@/lib/useAsyncData';
 import type { MembershipRequest, MembershipStatus, TrainingTime } from '@/types/club';
@@ -68,26 +69,48 @@ export function MembershipsPanel({ readOnly = false }: { readOnly?: boolean }) {
     }
   };
 
+  type ExportRow = { header: string; value: (row: MembershipRequest) => string | number };
+
+  const exportColumns = (): ExportRow[] => [
+    { header: t('colName'), value: (row: MembershipRequest) => row.full_name },
+    { header: t('colEmail'), value: (row: MembershipRequest) => row.email },
+    { header: t('colUniversity'), value: (row: MembershipRequest) => row.university },
+    { header: t('colPhone'), value: (row: MembershipRequest) => row.phone ?? '' },
+    { header: t('colLevel'), value: (row: MembershipRequest) => t(LEVEL_KEYS[row.level]) },
+    { header: t('fieldYears'), value: (row: MembershipRequest) => (row.years_playing ? t(YEARS_KEYS[row.years_playing]) : '') },
+    { header: t('fieldTrainingTime'), value: (row: MembershipRequest) => (row.training_time ? t(TRAINING_KEYS[row.training_time]) : '') },
+    { header: t('colRating'), value: (row: MembershipRequest) => (row.fide_rating === null ? '' : row.fide_rating) },
+    { header: t('colInterests'), value: (row: MembershipRequest) => row.interests ?? '' },
+    { header: t('colMessage'), value: (row: MembershipRequest) => row.message ?? '' },
+    { header: t('colStatus'), value: (row: MembershipRequest) => t(MEMBERSHIP_STATUS_KEYS[row.status]) },
+    { header: t('colDate'), value: (row: MembershipRequest) => row.created_at },
+  ];
+
   const handleExport = async () => {
     setExporting(true);
     setActionError(null);
     try {
       const rows = await exportMembershipRequests();
-      const csv = buildCsv(rows, [
-        { header: t('colName'), value: (row) => row.full_name },
-        { header: t('colEmail'), value: (row) => row.email },
-        { header: t('colUniversity'), value: (row) => row.university },
-        { header: t('colPhone'), value: (row) => row.phone ?? '' },
-        { header: t('colLevel'), value: (row) => t(LEVEL_KEYS[row.level]) },
-        { header: t('fieldYears'), value: (row) => (row.years_playing ? t(YEARS_KEYS[row.years_playing]) : '') },
-        { header: t('fieldTrainingTime'), value: (row) => (row.training_time ? t(TRAINING_KEYS[row.training_time]) : '') },
-        { header: t('colRating'), value: (row) => (row.fide_rating === null ? '' : row.fide_rating) },
-        { header: t('colInterests'), value: (row) => row.interests ?? '' },
-        { header: t('colMessage'), value: (row) => row.message ?? '' },
-        { header: t('colStatus'), value: (row) => t(MEMBERSHIP_STATUS_KEYS[row.status]) },
-        { header: t('colDate'), value: (row) => row.created_at },
-      ]);
-      downloadCsv('8squared-membership-requests.csv', csv);
+      downloadCsv('8squared-membership-requests.csv', buildCsv(rows, exportColumns()));
+    } catch {
+      setActionError('adminActionError');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    setExporting(true);
+    setActionError(null);
+    try {
+      const rows = await exportMembershipRequests();
+      exportPdfTable({
+        filename: '8squared-membership-requests.pdf',
+        title: t('adminPdfMembershipsTitle'),
+        subtitle: t('adminPdfSubtitle'),
+        columns: exportColumns(),
+        rows,
+      });
     } catch {
       setActionError('adminActionError');
     } finally {
@@ -106,10 +129,16 @@ export function MembershipsPanel({ readOnly = false }: { readOnly?: boolean }) {
           <h2 className="text-2xl">{t('membershipTitle')}</h2>
           <p className="text-muted">{t('adminRowsTotal', { n: total })}</p>
         </div>
-        <button type="button" onClick={handleExport} disabled={exporting} className="btn-primary">
-          <Download className="h-4 w-4" aria-hidden="true" />
-          {exporting ? t('adminExporting') : t('adminExportCsv')}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button type="button" onClick={handleExport} disabled={exporting} className="btn-secondary">
+            <Download className="h-4 w-4" aria-hidden="true" />
+            {exporting ? t('adminExporting') : t('adminExportCsv')}
+          </button>
+          <button type="button" onClick={handleExportPdf} disabled={exporting} className="btn-primary">
+            <FileText className="h-4 w-4" aria-hidden="true" />
+            {t('adminExportPdf')}
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSearch} role="search" className="flex flex-col gap-3 sm:flex-row sm:items-end">

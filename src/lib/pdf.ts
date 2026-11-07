@@ -28,7 +28,7 @@ export function exportPdfTable<T>({
   subtitle,
   columns,
   rows,
-  rtl = false,
+  rtl,
 }: {
   filename: string;
   title: string;
@@ -39,7 +39,8 @@ export function exportPdfTable<T>({
 }): void {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
-  const generated = new Date().toLocaleString(rtl ? 'ar' : 'en-GB');
+  const isRtl = rtl ?? document.documentElement.getAttribute('dir') === 'rtl';
+  const generated = new Date().toLocaleString(isRtl ? 'ar' : 'en-GB');
   const head = columns.map((column) => `<th>${escapeHtml(column.header)}</th>`).join('');
   const body = rows
     .map(
@@ -51,7 +52,7 @@ export function exportPdfTable<T>({
     .join('');
 
   const html = `<!doctype html>
-<html lang="${rtl ? 'ar' : 'en'}" dir="${rtl ? 'rtl' : 'ltr'}">
+<html lang="${isRtl ? 'ar' : 'en'}" dir="${isRtl ? 'rtl' : 'ltr'}">
 <head>
 <meta charset="utf-8" />
 <title>${escapeHtml(filename.replace(/\.pdf$/i, ''))}</title>
@@ -80,7 +81,7 @@ export function exportPdfTable<T>({
     <thead><tr>${head}</tr></thead>
     <tbody>${body || `<tr><td colspan="${columns.length}">—</td></tr>`}</tbody>
   </table>
-  <footer>8squared · ${rows.length} ${rtl ? 'سجل' : 'records'}</footer>
+  <footer>8squared · ${rows.length} ${isRtl ? 'سجل' : 'records'}</footer>
   <script>window.onload = function () { window.focus(); window.print(); };</script>
 </body>
 </html>`;
