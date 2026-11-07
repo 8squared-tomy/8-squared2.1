@@ -5,7 +5,7 @@ import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 export const unlockEditor = createServerFn({method:'POST'}).middleware([requireSupabaseAuth]).inputValidator(z.object({email:z.string().email(),password:z.string().min(1).max(256)})).handler(async({data,context})=>{
  const {data:eligible,error}=await context.supabase.rpc('is_editor_identity');
  if(error||eligible!==true)return {ok:false};
- const url=process.env['SUPABASE_URL'];const key=process.env['SUPABASE_PUBLISHABLE_KEY'];if(!url||!key)throw Error('Auth unavailable');
+ const {serverSupabaseUrl,serverSupabasePublishableKey}=await import('@/integrations/supabase/env.server');const url=serverSupabaseUrl();const key=serverSupabasePublishableKey();
  const client=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:(input,init)=>{const h=new Headers(init?.headers);if(key.startsWith('sb_')&&h.get('Authorization')===`Bearer ${key}`)h.delete('Authorization');h.set('apikey',key);return fetch(input,{...init,headers:h});}}});
  const {data:verified,error:failed}=await client.auth.signInWithPassword(data);
  if(failed||verified.user?.id!==context.userId)return {ok:false};
