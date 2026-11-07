@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { isMissingSchema, warnMissingSchemaOnce } from '@/lib/schemaGuard';
 import { registrationSchema } from '@/lib/validation';
 import { normalizeEmail } from '@/lib/validation';
 import type { TranslationKey } from '@/i18n/translations';
@@ -24,19 +25,37 @@ export async function fetchPublishedEvents(): Promise<ClubEvent[]> {
     .eq('status', 'published')
     .order('starts_at', { ascending: true })
     .limit(200);
-  if (error) throw error;
+  if (error) {
+    if (isMissingSchema(error)) {
+      warnMissingSchemaOnce(error);
+      return [];
+    }
+    throw error;
+  }
   return data ?? [];
 }
 
 export async function fetchEventById(id: string): Promise<ClubEvent | null> {
   const { data, error } = await supabase.from('events').select('*').eq('id', id).eq('status', 'published').maybeSingle();
-  if (error) throw error;
+  if (error) {
+    if (isMissingSchema(error)) {
+      warnMissingSchemaOnce(error);
+      return null;
+    }
+    throw error;
+  }
   return data;
 }
 
 export async function fetchEventSeatCounts(): Promise<Record<string, number>> {
   const { data, error } = await supabase.rpc('get_event_seat_counts');
-  if (error) throw error;
+  if (error) {
+    if (isMissingSchema(error)) {
+      warnMissingSchemaOnce(error);
+      return {};
+    }
+    throw error;
+  }
   const rows = (data ?? []) as { event_id: string; confirmed_count: number }[];
   return Object.fromEntries(rows.map((row) => [row.event_id, row.confirmed_count]));
 }
@@ -46,7 +65,13 @@ export async function fetchEventSponsors(eventId: string): Promise<Sponsor[]> {
     .from('event_sponsors')
     .select('sponsor:sponsors(*)')
     .eq('event_id', eventId);
-  if (error) throw error;
+  if (error) {
+    if (isMissingSchema(error)) {
+      warnMissingSchemaOnce(error);
+      return [];
+    }
+    throw error;
+  }
   return (data ?? []).map((row) => row.sponsor as unknown as Sponsor).filter((sponsor) => sponsor?.is_active);
 }
 
@@ -57,7 +82,13 @@ export async function fetchActiveSponsors(): Promise<Sponsor[]> {
     .eq('is_active', true)
     .order('sort_order', { ascending: true })
     .limit(200);
-  if (error) throw error;
+  if (error) {
+    if (isMissingSchema(error)) {
+      warnMissingSchemaOnce(error);
+      return [];
+    }
+    throw error;
+  }
   return data ?? [];
 }
 
@@ -68,7 +99,13 @@ export async function fetchActiveLinks(): Promise<ExternalLink[]> {
     .eq('is_active', true)
     .order('sort_order', { ascending: true })
     .limit(100);
-  if (error) throw error;
+  if (error) {
+    if (isMissingSchema(error)) {
+      warnMissingSchemaOnce(error);
+      return [];
+    }
+    throw error;
+  }
   return data ?? [];
 }
 
@@ -95,7 +132,13 @@ export function resetSiteContentCache(): void {
 
 async function loadSiteContent(): Promise<SiteContentEntry[]> {
   const { data, error } = await supabase.from('site_content').select('key, value_en, value_ar').limit(100);
-  if (error) throw error;
+  if (error) {
+    if (isMissingSchema(error)) {
+      warnMissingSchemaOnce(error);
+      return [];
+    }
+    throw error;
+  }
   return data ?? [];
 }
 
