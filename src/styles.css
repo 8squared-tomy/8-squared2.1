@@ -2,38 +2,43 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Light theme: warm ivory paper with deep ink and antique gold.
+   Comfortable for long reading — soft background, high but not harsh contrast. */
 :root {
-  --app: #f6f5f2;
-  --surface: #ffffff;
-  --surface-2: #eceae4;
-  --ink: #14181d;
-  --muted: #5b6470;
-  --border: #d8d5cd;
-  --gold: #a9791c;
-  --on-gold: #ffffff;
-  --cover: #121c26;
-  --on-cover: #f2f5f8;
-  --cover-accent: #e3b84a;
-  --danger: #b3261e;
-  --success: #1b7f4b;
-  --ring: #a9791c;
+  --app: #f7f3e9;
+  --surface: #fffdf8;
+  --surface-2: #efe8d8;
+  --ink: #1a150e;
+  --muted: #6a6051;
+  --border: #ded3bd;
+  --gold: #8a6410;
+  --gold-bright: #b8891f;
+  --on-gold: #fffdf6;
+  --cover: #15110a;
+  --on-cover: #f8f2e4;
+  --cover-accent: #e0b95f;
+  --danger: #a3291d;
+  --success: #14663c;
+  --ring: #8a6410;
 }
 
+/* Dark theme: near-black lacquer with metallic gold accents. */
 .dark {
-  --app: #0b0f14;
-  --surface: #131a22;
-  --surface-2: #1b242e;
-  --ink: #eef1f5;
-  --muted: #9aa6b2;
-  --border: #26313d;
-  --gold: #e3b84a;
-  --on-gold: #0b0f14;
-  --cover: #101a24;
-  --on-cover: #f2f5f8;
-  --cover-accent: #e3b84a;
-  --danger: #ff8a80;
-  --success: #6ee7a8;
-  --ring: #e3b84a;
+  --app: #08080a;
+  --surface: #121116;
+  --surface-2: #1c1a20;
+  --ink: #f6f0e2;
+  --muted: #a89e8c;
+  --border: #2e2a24;
+  --gold: #e6c168;
+  --gold-bright: #f3d68f;
+  --on-gold: #100d07;
+  --cover: #0b0a08;
+  --on-cover: #f6f0e2;
+  --cover-accent: #e6c168;
+  --danger: #ff9d92;
+  --success: #74e2a6;
+  --ring: #e6c168;
 }
 
 .contrast {
@@ -50,6 +55,7 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
   --color-on-gold: var(--on-gold);
   --color-cover: var(--cover);
   --color-on-cover: var(--on-cover);
@@ -61,17 +67,17 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 17px;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
 }
 
 html[data-font="large"] {
-  font-size: 17.5px;
+  font-size: 18.5px;
 }
 
 html[data-font="xlarge"] {
-  font-size: 19px;
+  font-size: 20.5px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -93,7 +99,7 @@ body {
   background-color: var(--app);
   color: var(--ink);
   font-family: var(--font-sans);
-  line-height: 1.6;
+  line-height: 1.65;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
@@ -106,6 +112,11 @@ body {
 @layer components {
   .card {
     @apply rounded-xl border border-border bg-surface p-6;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  }
+
+  .dark .card {
+    box-shadow: 0 1px 0 rgb(230 193 104 / 0.08), 0 12px 28px rgb(0 0 0 / 0.35);
   }
 
   .input {
@@ -142,6 +153,7 @@ body {
 
   .btn-secondary:hover {
     border-color: var(--gold);
+    color: var(--gold);
   }
 
   .btn-ghost {

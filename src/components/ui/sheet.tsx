@@ -1,12 +1,18 @@
 import {
   createContext,
+  cloneElement,
+  isValidElement,
   useCallback,
   useContext,
   useEffect,
   useId,
   useRef,
+  useState,
+  type ReactElement,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { cn } from '@/lib/utils';
@@ -24,12 +30,28 @@ export function Sheet({ open, onOpenChange, children }: { open: boolean; onOpenC
   return <SheetContext.Provider value={{ open, onOpenChange }}>{children}</SheetContext.Provider>;
 }
 
-export function SheetTrigger({ children }: { children: ReactNode; asChild?: boolean }) {
+/**
+ * The trigger attaches its handler to the child element itself. Wrapping it in a
+ * `display: contents` span used to swallow the click in some browsers, which left
+ * the page with a locked scroll and no visible menu.
+ */
+export function SheetTrigger({ children, asChild = false }: { children: ReactNode; asChild?: boolean }) {
   const { open, onOpenChange } = useSheet('SheetTrigger');
+
+  if (asChild && isValidElement(children)) {
+    const child = children as ReactElement<{ onClick?: (event: ReactMouseEvent) => void }>;
+    return cloneElement(child, {
+      onClick: (event: ReactMouseEvent) => {
+        child.props.onClick?.(event);
+        onOpenChange(!open);
+      },
+    });
+  }
+
   return (
-    <span onClick={() => onOpenChange(!open)} className="contents">
+    <button type="button" onClick={() => onOpenChange(!open)} className="contents">
       {children}
-    </span>
+    </button>
   );
 }
 
@@ -45,6 +67,9 @@ export function SheetContent({
   const { open, onOpenChange } = useSheet('SheetContent');
   const panel = useRef<HTMLDivElement>(null);
   const close = useCallback(() => onOpenChange(false), [onOpenChange]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!open) return;
@@ -53,33 +78,38 @@ export function SheetContent({
     };
     document.addEventListener('keydown', onKeyDown);
     const previousOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     document.body.style.overflow = 'hidden';
     const focusable = panel.current?.querySelector<HTMLElement>('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
     focusable?.focus();
     return () => {
       document.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus?.();
     };
   }, [open, close]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-50">
+  // Portalled to <body>: the header uses sticky positioning and previously
+  // trapped this fixed overlay inside its own box, so the menu could not paint.
+  return createPortal(
+    <div className="fixed inset-0 z-[100]">
       <div className="absolute inset-0 bg-black/60" aria-hidden="true" onClick={close} />
       <div
         ref={panel}
         role="dialog"
         aria-modal="true"
         className={cn(
-          'absolute inset-y-0 flex w-[min(22rem,88vw)] flex-col bg-surface shadow-xl',
+          'absolute inset-y-0 flex w-[min(22rem,88vw)] flex-col bg-surface shadow-2xl',
           side === 'right' ? 'end-0' : 'start-0',
           className,
         )}
       >
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
