@@ -9,21 +9,23 @@
    (buttons, cards, header, footer, admin) follow the chosen theme.
 --------------------------------------------------------------------------- */
 :root {
-  --app: #f7f3e9;
-  --surface: #fffdf8;
-  --surface-2: #efe8d8;
+  /* Softened ivory: lower luminance than pure white so long reading sessions
+     stay comfortable and gold accents keep their contrast. */
+  --app: #e9e2d2;
+  --surface: #f4eee0;
+  --surface-2: #ded5c2;
   --ink: #1a150e;
-  --muted: #6a6051;
-  --border: #ded3bd;
-  --gold: #8a6410;
-  --gold-bright: #b8891f;
-  --on-gold: #fffdf6;
+  --muted: #5c5344;
+  --border: #cdc1a8;
+  --gold: #7a570d;
+  --gold-bright: #a67a18;
+  --on-gold: #fbf6e9;
   --cover: #15110a;
   --on-cover: #f8f2e4;
   --cover-accent: #e0b95f;
-  --danger: #a3291d;
-  --success: #14663c;
-  --ring: #8a6410;
+  --danger: #97251a;
+  --success: #12603a;
+  --ring: #7a570d;
   color-scheme: light;
 }
 
