@@ -19,8 +19,11 @@ export async function getCurrentSession() {
 export async function verifyAdminPassword(password: string): Promise<boolean> {
   const session = await getCurrentSession();
   if (!session?.user.email) return false;
-  const { error } = await supabase.auth.signInWithPassword({ email: session.user.email, password });
-  return !error;
+  // Verified on the server with an isolated client: a second client-side
+  // signInWithPassword would issue a new auth session and orphan the
+  // editor_sessions row that is_admin() keys on session_id.
+  const result = await unlockEditor({ data: { email: session.user.email, password } });
+  return result.ok === true;
 }
 
 export async function updateAdminCredentials(attributes: { email?: string; password?: string; current_password?: string }): Promise<void> {
