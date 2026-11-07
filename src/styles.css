@@ -59,12 +59,12 @@
 
 /* Walnut: warm wood board with brass pieces. */
 html[data-board="walnut"] {
-  --app: #f6eee1;
-  --surface: #fffaf2;
-  --surface-2: #ecdfcc;
+  --app: #e8ddc9;
+  --surface: #f3ead9;
+  --surface-2: #ddcdb4;
   --ink: #241a10;
-  --muted: #6d5a44;
-  --border: #d9c6a9;
+  --muted: #5f4d38;
+  --border: #c8b191;
   --gold: #8b5e26;
   --gold-bright: #a97434;
   --on-gold: #fffaf0;
@@ -92,12 +92,12 @@ html.dark[data-board="walnut"] {
 
 /* Marble: cool stone board with slate-blue pieces. */
 html[data-board="marble"] {
-  --app: #f4f6f8;
-  --surface: #ffffff;
-  --surface-2: #e8ecf1;
+  --app: #e3e8ed;
+  --surface: #f1f4f7;
+  --surface-2: #d7dee7;
   --ink: #14181d;
-  --muted: #5b6673;
-  --border: #d3dae2;
+  --muted: #4e5966;
+  --border: #c2ccd7;
   --gold: #2c4a63;
   --gold-bright: #3d6383;
   --on-gold: #f7fafc;
@@ -125,12 +125,12 @@ html.dark[data-board="marble"] {
 
 /* Midnight: royal navy board with silver pieces. */
 html[data-board="midnight"] {
-  --app: #f2f4fb;
-  --surface: #ffffff;
-  --surface-2: #e6eaf7;
+  --app: #e2e6f2;
+  --surface: #eff2fa;
+  --surface-2: #d4dcef;
   --ink: #131a2e;
-  --muted: #5a6480;
-  --border: #d2d9ee;
+  --muted: #4c5674;
+  --border: #c0cae6;
   --gold: #24336b;
   --gold-bright: #34478f;
   --on-gold: #f6f8ff;
@@ -158,12 +158,12 @@ html.dark[data-board="midnight"] {
 
 /* Emerald: tournament felt with champagne pieces. */
 html[data-board="emerald"] {
-  --app: #f1f7f2;
-  --surface: #ffffff;
-  --surface-2: #e2efe5;
+  --app: #e1ece4;
+  --surface: #eef6f0;
+  --surface-2: #d1e2d7;
   --ink: #0f1f16;
-  --muted: #4f6656;
-  --border: #cfe0d4;
+  --muted: #445a4b;
+  --border: #bcd2c3;
   --gold: #14663c;
   --gold-bright: #1c7f4c;
   --on-gold: #f4fbf6;
@@ -421,5 +421,75 @@ option {
 
   p {
     margin: 0;
+  }
+}
+
+/* --- Hero slogan: display lettering matching the club crest --------------- */
+.slogan-display {
+  font-family: "Cinzel", "Trajan Pro", "Optima", ui-serif, Georgia, "Times New Roman", serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+  line-height: 0.98;
+  text-wrap: balance;
+  text-shadow: 0 2px 30px rgb(0 0 0 / 0.55);
+}
+
+/* --- Hero rook: the crest piece builds itself from base to crown ---------- */
+.rook-build .rook-piece {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  clip-path: inset(100% 0 0 0);
+  animation: rook-rise 1.35s cubic-bezier(0.22, 0.9, 0.24, 1) both;
+  animation-delay: calc(var(--seg, 0) * 150ms);
+}
+@keyframes rook-rise {
+  0% {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(12px) scaleY(0.94);
+    opacity: 0.2;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0) scaleY(1);
+    opacity: 1;
+  }
+}
+.rook-build .rook-glow {
+  animation: rook-glow 3.6s ease-in-out 1.9s infinite alternate;
+}
+@keyframes rook-glow {
+  from {
+    opacity: 0.22;
+  }
+  to {
+    opacity: 0.6;
+  }
+}
+.rook-build .rook-spark {
+  animation: rook-spark 4.5s ease-in-out 2s infinite alternate;
+}
+@keyframes rook-spark {
+  from {
+    opacity: 0.1;
+  }
+  to {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rook-build .rook-piece {
+    animation: none;
+    clip-path: none;
+    opacity: 1;
+    transform: none;
+  }
+  .rook-build .rook-glow,
+  .rook-build .rook-spark {
+    animation: none;
+    opacity: 0.4;
   }
 }
