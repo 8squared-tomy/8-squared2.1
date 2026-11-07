@@ -1,0 +1,141 @@
+import { ArrowRight, Shield, Trophy, Users } from 'lucide-react';
+import { EventCard } from '@/components/EventCard';
+import { useLanguage } from '@/i18n/LanguageProvider';
+import { useRouter } from '@tanstack/react-router';
+import type { HomeData } from '@/lib/home-data';
+import { Notice } from '@/components/FormField';
+import { Button } from '@/components/ui/button';
+import { MemberCarousel } from '@/components/MemberCarousel';
+
+// Hero image lives in public/chess-cover.jpg. Replace the file to change the picture.
+const COVER_IMAGE = '/chess-cover.jpg';
+
+export function HomePage({ loaded }: { loaded: HomeData }) {
+  const { t, pick } = useLanguage();
+  const { content, events, links, members } = loaded;
+  const router = useRouter();
+  const reload = () => void router.invalidate();
+
+  const getText = (key: string): string => {
+    const entry = content.data?.find((item) => item.key === key);
+    return entry ? pick(entry.value_en, entry.value_ar) : '';
+  };
+
+  const upcoming = (events.data?.events ?? [])
+    .filter((event) => new Date(event.ends_at ?? event.starts_at).getTime() >= Date.now())
+    .slice(0, 3);
+
+  return (
+    <>
+      <section className="relative isolate overflow-hidden bg-cover text-on-cover">
+        <img
+          src={COVER_IMAGE}
+          alt={t('heroImageAlt')}
+          className="absolute inset-0 -z-10 h-full w-full object-cover"
+          width={940}
+          height={650}
+          fetchPriority="high"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-cover/80 via-cover/70 to-cover" aria-hidden="true" />
+        <div className="mx-auto flex min-h-[70vh] max-w-6xl flex-col justify-center gap-6 px-4 py-20 sm:px-6">
+          <p className="eyebrow text-cover-accent">{t('heroEyebrow')}</p>
+          <h1 className="max-w-3xl text-4xl text-on-cover sm:text-6xl">{getText('hero_title') || t('brand')}</h1>
+          <p className="max-w-2xl text-lg leading-relaxed text-on-cover">{getText('hero_subtitle')}</p>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <a href="/membership" className="btn-primary">
+              {t('heroCtaJoin')}
+              <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+            </a>
+            <Button asChild variant="outline" className="btn-secondary h-auto border-on-cover/40 bg-cover text-on-cover hover:border-cover-accent hover:text-cover-accent">
+            <a href="/events">
+              {t('heroCtaEvents')}
+            </a>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="grid gap-10 md:grid-cols-[1fr_1.2fr] md:items-start">
+          <div className="space-y-4">
+            <p className="eyebrow">{t('brand')}</p>
+            <h2 className="text-3xl sm:text-4xl">{t('aboutTitle')}</h2>
+          </div>
+          <p className="text-lg leading-relaxed text-muted">{getText('about_body')}</p>
+        </div>
+
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {[
+            { icon: Users, title: t('cardJoinTitle'), body: t('cardJoinBody'), href: '/membership' },
+            { icon: Trophy, title: t('cardEventsTitle'), body: t('cardEventsBody'), href: '/events' },
+            { icon: Shield, title: t('cardSponsorsTitle'), body: t('cardSponsorsBody'), href: '/sponsors' },
+          ].map(({ icon: Icon, title, body, href }) => (
+            <a key={href} href={href} className="card group flex flex-col gap-4 hover:-translate-y-1 hover:border-gold">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-gold">
+                <Icon className="h-5 w-5 text-gold" aria-hidden="true" />
+              </span>
+              <h3 className="text-xl">{title}</h3>
+              <p className="text-muted">{body}</p>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <MemberCarousel members={members.data} />
+      <section className="border-y border-border bg-surface">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="eyebrow mb-2">{t('navEvents')}</p>
+              <h2 className="text-3xl">{t('eventsPreviewTitle')}</h2>
+            </div>
+            <a href="/events" className="btn-ghost">
+              {t('eventsViewAll')}
+              <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+            </a>
+          </div>
+          {events.error && (
+            <Notice tone="error">
+              <p>{t('loadError')}</p>
+              <button type="button" onClick={reload} className="btn-ghost mt-2 px-0 text-danger">
+                {t('retry')}
+              </button>
+            </Notice>
+          )}
+          {events.data && upcoming.length === 0 && <p className="text-muted">{t('emptyEvents')}</p>}
+          {events.data && upcoming.length > 0 && (
+            <div className="grid gap-6 md:grid-cols-3">
+              {upcoming.map((event) => (
+                <EventCard key={event.id} event={event} confirmedCount={events.data?.counts[event.id] ?? 0} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <h2 className="text-3xl">{t('linksTitle')}</h2>
+        <p className="mt-3 max-w-2xl text-muted">{t('linksIntro')}</p>
+        {links.data && links.data.length === 0 && <p className="mt-6 text-muted">{t('emptyLinks')}</p>}
+        {links.data && links.data.length > 0 && (
+          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {links.data.map((link) => (
+              <li key={link.id}>
+                <a
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="card flex min-h-11 items-center justify-between gap-3 hover:border-gold hover:text-gold"
+                >
+                  <span className="font-medium">{pick(link.label_en, link.label_ar)}</span>
+                  <ArrowRight className="h-4 w-4 shrink-0 rtl:rotate-180" aria-hidden="true" />
+                  <span className="sr-only">({t('sponsorVisit')})</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </>
+  );
+}

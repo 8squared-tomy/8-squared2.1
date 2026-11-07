@@ -1,0 +1,11 @@
+# Tasks
+- [ ] Confirm the GitHub repository is connected to the hosting provider so pushes deploy automatically.
+- [x] Smaller typography/icons, side overlay with accessibility, and single navigation on 404.
+- [x] Add circular member portraits and editable footer social links.
+- [ ] Verify successful editor unlock, form-builder save and portrait upload with a real password-authenticated session; managed test token has no session_id, and no password is available. Second editor account still needs creation.
+- [x] Versioned configurable event/membership forms, builder, secure submissions and exports without deleting old data.
+- [x] Verify public submissions with both accommodation choices, capacity waitlist, authenticated answer readback, rejected wrong-password unlock, mobile 404 and 16 tests; remove temporary test records.
+- [x] Remove external render-blocking font dependencies, preload the managed homepage image, and fix confirmed contrast and unnamed-button issues; browser accessibility checks pass in desktop, mobile, and Arabic dark mode, and 7 existing tests pass. Published response-time improvement remains unmeasured until republishing and repeating WebPageTest.
+- [x] Add conditional accommodation fields to event registration and validate both choices.
+- [x] Store accommodation details safely and include them in administrator tables and CSV exports.
+- [x] Verify real registrations with both choices, Arabic layout, and conditional validation; provide administrator setup steps and suggestions.
