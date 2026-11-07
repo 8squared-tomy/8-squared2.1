@@ -54,6 +54,10 @@ export function AccountPanel() {
     setSaving(true);
     setError(null);
     try {
+      if (!currentPassword) {
+        setError('errRequired');
+        return;
+      }
       if (!(await verifyAdminPassword(currentPassword))) {
         setError('accountWrongPassword');
         return;

@@ -38,7 +38,7 @@ export function LanguageProvider({ children, initialLanguage }: { children: Reac
         let text: string = dictionary[key];
         if (values) {
           for (const [name, replacement] of Object.entries(values)) {
-            text = text.replace(`{${name}}`, String(replacement));
+            text = text.split(`{${name}}`).join(String(replacement));
           }
         }
         return text;

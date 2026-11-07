@@ -15,8 +15,12 @@ export function seatsLeft(event: ClubEvent, confirmedCount: number): number | nu
   return Math.max(event.capacity - confirmedCount, 0);
 }
 
+// Club events are scheduled in Algiers time; render them there instead of the
+// visitor's timezone, and force Latin digits for the Arabic locale.
 export function formatDateTime(iso: string, language: 'en' | 'ar'): string {
-  return new Date(iso).toLocaleString(language === 'ar' ? 'ar' : 'en-GB', {
+  return new Date(iso).toLocaleString(language === 'ar' ? 'ar-DZ' : 'en-GB', {
+    timeZone: 'Africa/Algiers',
+    numberingSystem: 'latn',
     weekday: 'short',
     day: 'numeric',
     month: 'short',

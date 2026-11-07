@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { registrationSchema } from '@/lib/validation';
+import { normalizeEmail } from '@/lib/validation';
 import type { TranslationKey } from '@/i18n/translations';
 import type { ClubEvent, ChessLevel, ExternalLink, RegistrationStatus, Sponsor, SiteContentEntry, TrainingTime, YearsPlaying } from '@/types/club';
 
@@ -86,6 +87,12 @@ export function fetchSiteContent(): Promise<SiteContentEntry[]> {
   return siteContentRequest;
 }
 
+// Admin writes must drop the shared browser cache, otherwise the header and the
+// home page keep rendering the previous values for the rest of the session.
+export function resetSiteContentCache(): void {
+  siteContentRequest = null;
+}
+
 async function loadSiteContent(): Promise<SiteContentEntry[]> {
   const { data, error } = await supabase.from('site_content').select('key, value_en, value_ar').limit(100);
   if (error) throw error;
@@ -103,9 +110,9 @@ export type MembershipPayload = {
 
 export async function submitMembershipRequest(payload: MembershipPayload): Promise<ActionResult<null>> {
   const { error } = await supabase.rpc('submit_membership_request', {
-    p_full_name: payload.fullName,
-    p_email: payload.email,
-    p_university: payload.university,
+    p_full_name: payload.fullName.trim(),
+    p_email: normalizeEmail(payload.email),
+    p_university: payload.university.trim(),
     p_phone: null,
     p_level: payload.level,
     p_years_playing: payload.yearsPlaying,
@@ -130,16 +137,18 @@ export type RegistrationPayload = {
 };
 
 export async function registerForEvent(payload: RegistrationPayload): Promise<ActionResult<RegistrationStatus>> {
-  if (!registrationSchema.safeParse(payload).success) return { ok: false, errorKey: 'invalidRequired' };
+  const parsed = registrationSchema.safeParse(payload);
+  if (!parsed.success) return { ok: false, errorKey: 'invalidRequired' };
+  const input = parsed.data;
   const { data, error } = await supabase.rpc('register_for_event', {
     p_event_id: payload.eventId,
-    p_full_name: payload.fullName,
-    p_email: payload.email,
-    p_university: payload.university,
-    p_phone: payload.needsAccommodation ? payload.phone.trim() : '',
-    p_needs_accommodation: payload.needsAccommodation,
-    p_residence: payload.needsAccommodation ? payload.residence.trim() : '',
-    p_bac_registration_number: payload.needsAccommodation ? payload.bacRegistrationNumber.trim() : '',
+    p_full_name: input.fullName,
+    p_email: normalizeEmail(input.email),
+    p_university: input.university,
+    p_phone: input.needsAccommodation ? input.phone.trim() : '',
+    p_needs_accommodation: input.needsAccommodation,
+    p_residence: input.needsAccommodation ? input.residence.trim() : '',
+    p_bac_registration_number: input.needsAccommodation ? input.bacRegistrationNumber.trim() : '',
   });
   if (error) return { ok: false, errorKey: errorKeyFrom(error) };
   if (data !== 'confirmed' && data !== 'waitlisted') return { ok: false, errorKey: 'errGeneric' };

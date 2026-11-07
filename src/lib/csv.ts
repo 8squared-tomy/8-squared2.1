@@ -5,9 +5,16 @@ export type CsvColumn<T> = {
   value: (row: T) => CsvValue;
 };
 
+// Guard against spreadsheet formula injection, but keep real negative numbers
+// (e.g. -5) readable instead of escaping every leading minus sign.
+function needsFormulaPrefix(text: string): boolean {
+  if (/^[=+@\t\r]/.test(text)) return true;
+  return /^-/.test(text) && !/^-\d+(\.\d+)?$/.test(text);
+}
+
 function escapeCell(value: CsvValue): string {
   let text = value === null || value === undefined ? '' : String(value);
-  if (/^[=+\-@\t\r]/.test(text)) {
+  if (needsFormulaPrefix(text)) {
     text = `'${text}`;
   }
   return `"${text.replace(/"/g, '""')}"`;
@@ -28,5 +35,6 @@ export function downloadCsv(filename: string, content: string): void {
   document.body.appendChild(link);
   link.click();
   link.remove();
-  URL.revokeObjectURL(url);
+  // Revoking synchronously can abort the download in Firefox and Safari.
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
