@@ -5,7 +5,7 @@ import { FormField, Notice } from '@/components/FormField';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import type { TranslationKey } from '@/i18n/translations';
 import { submitMembershipRequest } from '@/lib/publicApi';
-import { LEVELS, TRAINING_TIMES, YEARS, validateMembership, type MembershipInput, type FieldErrors } from '@/lib/validation';
+import { LEVELS, TRAINING_TIMES, YEARS, normalizeEmail, validateMembership, type MembershipInput, type FieldErrors } from '@/lib/validation';
 import type { ChessLevel, TrainingTime, YearsPlaying } from '@/types/club';
 
 const EMPTY: MembershipInput = {
@@ -63,8 +63,8 @@ export function MembershipForm() {
     setServerError(null);
     const outcome = await submitMembershipRequest({
       fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
-      email: form.email,
-      university: form.university,
+      email: normalizeEmail(form.email),
+      university: form.university.trim(),
       level: form.level as ChessLevel,
       yearsPlaying: form.yearsPlaying as YearsPlaying,
       trainingTime: form.trainingTime as TrainingTime,

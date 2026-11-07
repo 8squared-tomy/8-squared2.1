@@ -121,6 +121,7 @@ export function MembershipsPanel({ readOnly = false }: { readOnly?: boolean }) {
             id="membership-search"
             type="search"
             className="input"
+            placeholder={t('searchPlaceholder')}
             value={draftSearch}
             onChange={(e) => setDraftSearch(e.target.value)}
           />

@@ -326,7 +326,7 @@ export const en = {
   registrationWaitlistedBody: 'The event is full, so you have been added to the waitlist.',
   registrationWaitlistedTitle: "You're on the waitlist",
   searchLabel: 'Search',
-  searchPlaceholder: 'Search by name, email, or university',
+  searchPlaceholder: 'Search by name or email',
   statusAll: 'All statuses',
 } as const;
 
@@ -660,6 +660,6 @@ export const ar: Record<TranslationKey, string> = {
   registrationWaitlistedBody: 'الفعالية مكتملة، لذا تمت إضافتك إلى قائمة الانتظار.',
   registrationWaitlistedTitle: 'أنت في قائمة الانتظار',
   searchLabel: 'بحث',
-  searchPlaceholder: 'ابحث بالاسم أو البريد الإلكتروني أو الجامعة',
+  searchPlaceholder: 'ابحث بالاسم أو البريد الإلكتروني',
   statusAll: 'كل الحالات',
 };

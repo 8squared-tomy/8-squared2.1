@@ -134,6 +134,7 @@ export function RegistrationsPanel({ event, onBack, readOnly=false }: { event: C
             id="registration-search"
             type="search"
             className="input"
+            placeholder={t('searchPlaceholder')}
             value={draftSearch}
             onChange={(e) => setDraftSearch(e.target.value)}
           />
