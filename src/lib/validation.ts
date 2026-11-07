@@ -125,3 +125,15 @@ export function isSafeHttpsUrl(value: string): boolean {
     return false;
   }
 }
+
+/**
+ * Logo sources are either an https address or a raster data URL produced by the
+ * admin upload control. SVG data URLs are deliberately rejected: they can carry
+ * script when opened directly.
+ */
+export function isSafeImageSource(value: string): boolean {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  if (isSafeHttpsUrl(trimmed)) return true;
+  return /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/]+=*$/.test(trimmed);
+}
