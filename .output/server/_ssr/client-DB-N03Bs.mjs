@@ -1,12 +1,13 @@
 import { t as createClient } from "../_libs/supabase__supabase-js.mjs";
+import processModule from "node:process";
 //#region node_modules/.nitro/vite/services/ssr/assets/client-DB-N03Bs.js
 function isNewSupabaseApiKey(value) {
 	return value.startsWith("sb_publishable_") || value.startsWith("sb_secret_");
 }
 function serverSupabaseUrl(publicUrl, supabaseKey) {
-	if (typeof window !== "undefined" || typeof process === "undefined") return void 0;
-	const serverUrl = process.env["SUPABASE_URL"]?.replace(/\/+$/, "");
-	if (!serverUrl || serverUrl === publicUrl || process.env["SUPABASE_PUBLISHABLE_KEY"] !== supabaseKey) return void 0;
+	if (typeof window !== "undefined" || typeof processModule === "undefined") return void 0;
+	const serverUrl = processModule.env["SUPABASE_URL"]?.replace(/\/+$/, "");
+	if (!serverUrl || serverUrl === publicUrl || processModule.env["SUPABASE_PUBLISHABLE_KEY"] !== supabaseKey) return void 0;
 	return serverUrl;
 }
 function createSupabaseFetch(supabaseUrl, supabaseKey) {
@@ -48,7 +49,7 @@ function createSupabaseClient() {
 		"TSS_INLINE_CSS_ENABLED": "false",
 		"TSS_ROUTER_BASEPATH": "",
 		"TSS_SERVER_FN_BASE": "/_serverFn/"
-	}["VITE_SUPABASE_URL"] || process.env["SUPABASE_URL"];
+	}["VITE_SUPABASE_URL"] || processModule.env["SUPABASE_URL"];
 	const SUPABASE_PUBLISHABLE_KEY = {
 		"BASE_URL": "/",
 		"DEV": false,
@@ -62,7 +63,7 @@ function createSupabaseClient() {
 		"TSS_INLINE_CSS_ENABLED": "false",
 		"TSS_ROUTER_BASEPATH": "",
 		"TSS_SERVER_FN_BASE": "/_serverFn/"
-	}["VITE_SUPABASE_PUBLISHABLE_KEY"] || process.env["SUPABASE_PUBLISHABLE_KEY"];
+	}["VITE_SUPABASE_PUBLISHABLE_KEY"] || processModule.env["SUPABASE_PUBLISHABLE_KEY"];
 	if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 		const message = `Missing Supabase environment variable(s): ${[...!SUPABASE_URL ? ["SUPABASE_URL"] : [], ...!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []].join(", ")}. Set it in your hosting environment variables.`;
 		console.error(`[Supabase] ${message}`);

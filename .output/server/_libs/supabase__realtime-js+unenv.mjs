@@ -1,4 +1,7 @@
 import { n as Socket, t as Presence } from "./supabase__phoenix.mjs";
+//#region node_modules/unenv/dist/runtime/polyfill/globalthis.mjs
+var globalthis_default = globalThis;
+//#endregion
 //#region node_modules/@supabase/realtime-js/dist/module/lib/websocket-factory.js
 /**
 * Utilities for creating WebSocket instances across runtimes.
@@ -19,7 +22,7 @@ var WebSocketFactory = class {
 			type: "native",
 			wsConstructor: gt.WebSocket
 		};
-		const gl = typeof global !== "undefined" ? global : void 0;
+		const gl = typeof globalthis_default !== "undefined" ? globalthis_default : void 0;
 		if (gl && typeof gl.WebSocket !== "undefined") return {
 			type: "native",
 			wsConstructor: gl.WebSocket
@@ -2258,4 +2261,4 @@ var RealtimeClient = class {
 	}
 };
 //#endregion
-export { RealtimeClient as t };
+export { globalthis_default as n, RealtimeClient as t };

@@ -1,4 +1,4 @@
-import { r as __toESM } from "../_runtime.mjs";
+import { n as __toESM } from "../_runtime.mjs";
 import { r as require_react } from "./react+tanstack__react-query.mjs";
 import { t as EmblaCarousel } from "./embla-carousel.mjs";
 //#region node_modules/embla-carousel-reactive-utils/esm/embla-carousel-reactive-utils.esm.js
