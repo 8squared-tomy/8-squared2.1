@@ -1,6 +1,28 @@
+import { useState } from 'react';
+
+/** Club crest shipped with the site; used until an admin sets a custom logo. */
+export const DEFAULT_LOGO_SRC = '/club-logo.jpg';
+
+/**
+ * Renders the club logo. A configured logo (https URL or uploaded data URL)
+ * wins; otherwise the club crest image is used. If the image cannot load we
+ * fall back to the inline crown mark so the header never shows a broken image.
+ */
 export function SiteLogo({ url, className }: { url: string | null; className?: string }) {
-  if (url) {
-    return <img src={url} alt="" aria-hidden="true" className={`shrink-0 rounded-sm object-contain ${className ?? ''}`} />;
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const src = url ?? DEFAULT_LOGO_SRC;
+
+  if (failedSrc !== src) {
+    return (
+      <img
+        src={src}
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+        onError={() => setFailedSrc(src)}
+        className={`shrink-0 rounded-sm object-contain ${className ?? ''}`}
+      />
+    );
   }
 
   return (
