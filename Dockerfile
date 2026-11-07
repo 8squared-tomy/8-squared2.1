@@ -11,8 +11,10 @@ ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
 ENV VITE_SUPABASE_PUBLISHABLE_KEY=$VITE_SUPABASE_PUBLISHABLE_KEY
 
 RUN apk upgrade --no-cache
-COPY package.json bun.lock ./
-RUN npm install --no-audit --no-fund
+# package-lock.json keeps the image build deterministic: resolving fresh from
+# package.json alone crashes npm's arborist ("Cannot read properties of null").
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
 
