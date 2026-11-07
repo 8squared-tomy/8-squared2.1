@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { isMissingSchema, warnMissingSchemaOnce } from '@/lib/schemaGuard';
 export type ClubMember={id:string;name:string;club_role:string;photo_url:string|null;sort_order:number;is_active:boolean};
 export type SocialLink={id:string;platform:string|null;url:string;is_active:boolean};
 // One signed-URL request for all portraits instead of one per member.
@@ -8,7 +9,15 @@ export async function fetchMembers(): Promise<ClubMember[]> {
     .select('*')
     .eq('is_active', true)
     .order('sort_order');
-  if (error) throw error;
+  if (error) {
+    // The team section should stay hidden, not break the page, before the
+    // migration is applied.
+    if (isMissingSchema(error)) {
+      warnMissingSchemaOnce(error);
+      return [];
+    }
+    throw error;
+  }
   const members = (data ?? []) as ClubMember[];
 
   const paths = members
@@ -32,4 +41,4 @@ export async function fetchMembers(): Promise<ClubMember[]> {
   });
 }
 
-export async function fetchSocialLinks():Promise<SocialLink[]> {const {data,error}=await supabase.from('external_links').select('id,platform,url,is_active').in('platform',['linkedin','instagram','telegram']).eq('is_active',true);if(error)throw error;return data??[];}
+export async function fetchSocialLinks():Promise<SocialLink[]> {const {data,error}=await supabase.from('external_links').select('id,platform,url,is_active').in('platform',['linkedin','instagram','telegram']).eq('is_active',true);if(error){if(isMissingSchema(error)){warnMissingSchemaOnce(error);return [];}throw error;}return data??[];}
