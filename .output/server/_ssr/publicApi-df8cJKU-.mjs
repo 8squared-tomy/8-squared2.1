@@ -1,4 +1,4 @@
-import { n as objectType, r as stringType, t as booleanType } from "../_libs/zod.mjs";
+import { n as object, r as string, t as boolean } from "../_libs/zod.mjs";
 import { t as supabase$1 } from "./client-DB-N03Bs.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/publicApi-df8cJKU-.js
 var supabase = supabase$1;
@@ -45,14 +45,14 @@ function validateMembership(input) {
 	if (!TRAINING_TIMES.includes(input.trainingTime)) errors.trainingTime = "errTrainingTime";
 	return errors;
 }
-var registrationSchema = objectType({
-	fullName: stringType().trim().min(2, "errName").max(100, "errName"),
-	email: stringType().trim().refine(isValidEmail, "errEmail"),
-	university: stringType().trim().min(2, "errUniversity").max(120, "errUniversity"),
-	needsAccommodation: booleanType(),
-	residence: stringType(),
-	bacRegistrationNumber: stringType(),
-	phone: stringType()
+var registrationSchema = object({
+	fullName: string().trim().min(2, "errName").max(100, "errName"),
+	email: string().trim().refine(isValidEmail, "errEmail"),
+	university: string().trim().min(2, "errUniversity").max(120, "errUniversity"),
+	needsAccommodation: boolean(),
+	residence: string(),
+	bacRegistrationNumber: string(),
+	phone: string()
 }).superRefine((input, ctx) => {
 	if (!input.needsAccommodation) return;
 	if (!lengthBetween(input.residence.trim(), 2, 120)) ctx.addIssue({

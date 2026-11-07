@@ -2,7 +2,7 @@ import { n as __toESM } from "../_runtime.mjs";
 import { U as isRedirect, b as useRouter } from "../_libs/@tanstack/react-router+[...].mjs";
 import { l as createServerFn } from "./createServerFn-DDDJMFWM.mjs";
 import { t as requireSupabaseAuth } from "./auth-middleware-bot2Ewvl.mjs";
-import { n as objectType, r as stringType } from "../_libs/zod.mjs";
+import { n as object, r as string } from "../_libs/zod.mjs";
 import { n as require_jsx_runtime, r as require_react } from "../_libs/react+tanstack__react-query.mjs";
 import { t as Button } from "./button-BEg5oiP4.mjs";
 import { n as useLanguage } from "./LanguageProvider-CQ4v6zaN.mjs";
@@ -32,9 +32,9 @@ function useServerFn(serverFn) {
 		}
 	}, [router, serverFn]);
 }
-var unlockEditor = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator(objectType({
-	email: stringType().email(),
-	password: stringType().min(1).max(256)
+var unlockEditor = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator(object({
+	email: string().email(),
+	password: string().min(1).max(256)
 })).handler(createSsrRpc("494dd2083725c6ed9f2c918f56f17ada84ee4bbecf6d6f4a1d4edce5296b5adf"));
 var lockEditor = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(createSsrRpc("758f17c5228781d6c5e734dcadd18ba30fd83d4ea2f8d3737f6a4cbf947f9627"));
 async function signInAdmin(email, password) {

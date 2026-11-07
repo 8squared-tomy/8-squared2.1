@@ -2,7 +2,7 @@ import { l as createServerFn } from "./createServerFn-DDDJMFWM.mjs";
 import { t as createServerRpc } from "./createServerRpc-CxD4EZ5P.mjs";
 import { t as createClient } from "../_libs/supabase__supabase-js.mjs";
 import { t as requireSupabaseAuth } from "./auth-middleware-bot2Ewvl.mjs";
-import { n as objectType, r as stringType } from "../_libs/zod.mjs";
+import { n as object, r as string } from "../_libs/zod.mjs";
 import processModule from "node:process";
 //#region node_modules/.nitro/vite/services/ssr/assets/access.functions-DgklDXDj.js
 var unlockEditor_createServerFn_handler = createServerRpc({
@@ -10,9 +10,9 @@ var unlockEditor_createServerFn_handler = createServerRpc({
 	name: "unlockEditor",
 	filename: "src/lib/admin/access.functions.ts"
 }, (opts) => unlockEditor.__executeServer(opts));
-var unlockEditor = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator(objectType({
-	email: stringType().email(),
-	password: stringType().min(1).max(256)
+var unlockEditor = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator(object({
+	email: string().email(),
+	password: string().min(1).max(256)
 })).handler(unlockEditor_createServerFn_handler, async ({ data, context }) => {
 	const { data: eligible, error } = await context.supabase.rpc("is_editor_identity");
 	if (error || eligible !== true) return { ok: false };
@@ -38,7 +38,7 @@ var unlockEditor = createServerFn({ method: "POST" }).middleware([requireSupabas
 	if (failed || verified.user?.id !== context.userId) return { ok: false };
 	if (verified.session) await client.auth.signOut({ scope: "local" });
 	const sessionId = context.claims["session_id"];
-	if (typeof sessionId !== "string" || !stringType().uuid().safeParse(sessionId).success) return { ok: false };
+	if (typeof sessionId !== "string" || !string().uuid().safeParse(sessionId).success) return { ok: false };
 	const { supabaseAdmin } = await import("./client.server-CuhZr3oN.mjs");
 	const { error: writeError } = await supabaseAdmin.from("editor_sessions").upsert({
 		session_id: sessionId,
