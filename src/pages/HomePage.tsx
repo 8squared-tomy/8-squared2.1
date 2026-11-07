@@ -42,8 +42,10 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
           fetchPriority="high"
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-cover/80 via-cover/70 to-cover" aria-hidden="true" />
+        <div className="board-pattern absolute inset-0 -z-10 opacity-50" aria-hidden="true" />
         <div className="mx-auto flex min-h-[70vh] max-w-6xl flex-col justify-center gap-6 px-4 py-20 sm:px-6">
           <p className="eyebrow text-cover-accent">{t('heroEyebrow')}</p>
+          <div className="section-rule" aria-hidden="true" />
           <h1 className="max-w-3xl text-4xl text-on-cover sm:text-6xl">{getText('hero_title') || t('brand')}</h1>
           <p className="max-w-2xl text-lg leading-relaxed text-on-cover">{getText('hero_subtitle')}</p>
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -64,6 +66,7 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
         <div className="grid gap-10 md:grid-cols-[1fr_1.2fr] md:items-start">
           <div className="space-y-4">
             <p className="eyebrow">{t('brand')}</p>
+            <div className="section-rule" aria-hidden="true" />
             <h2 className="text-3xl sm:text-4xl">{t('aboutTitle')}</h2>
           </div>
           <p className="text-lg leading-relaxed text-muted">{getText('about_body')}</p>
@@ -75,7 +78,7 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
             { icon: Trophy, title: t('cardEventsTitle'), body: t('cardEventsBody'), href: '/events' },
             { icon: Shield, title: t('cardSponsorsTitle'), body: t('cardSponsorsBody'), href: '/sponsors' },
           ].map(({ icon: Icon, title, body, href }) => (
-            <a key={href} href={href} className="card group flex flex-col gap-4 hover:-translate-y-1 hover:border-gold">
+            <a key={href} href={href} className="card card-hover group flex flex-col gap-4">
               <span className="flex h-10 w-10 items-center justify-center rounded-full border border-gold">
                 <Icon className="h-5 w-5 text-gold" aria-hidden="true" />
               </span>
