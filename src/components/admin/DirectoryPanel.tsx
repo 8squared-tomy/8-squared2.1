@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Download, Mail, Phone } from 'lucide-react';
+import { Download, FileText, Mail, Phone } from 'lucide-react';
 import { Notice } from '@/components/FormField';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import type { TranslationKey } from '@/i18n/translations';
 import { exportMembershipRequests } from '@/lib/admin/members';
 import { buildCsv, downloadCsv } from '@/lib/csv';
+import { exportPdfTable } from '@/lib/pdf';
 import { LEVEL_KEYS } from '@/lib/labels';
+import type { MembershipRequest } from '@/types/club';
 import { useAsyncData } from '@/lib/useAsyncData';
 
 export function DirectoryPanel() {
@@ -26,19 +28,41 @@ export function DirectoryPanel() {
       : true,
   );
 
+  type ExportRow = { header: string; value: (row: MembershipRequest) => string | number };
+
+  const exportColumns = (): ExportRow[] => [
+    { header: t('colName'), value: (row: MembershipRequest) => row.full_name },
+    { header: t('colEmail'), value: (row: MembershipRequest) => row.email },
+    { header: t('colPhone'), value: (row: MembershipRequest) => row.phone ?? '' },
+    { header: t('colUniversity'), value: (row: MembershipRequest) => row.university },
+    { header: t('colLevel'), value: (row: MembershipRequest) => t(LEVEL_KEYS[row.level]) },
+  ];
+
   const handleExport = async () => {
     setExporting(true);
     setActionError(null);
     try {
       const rows = await exportMembershipRequests();
-      const csv = buildCsv(rows, [
-        { header: t('colName'), value: (row) => row.full_name },
-        { header: t('colEmail'), value: (row) => row.email },
-        { header: t('colPhone'), value: (row) => row.phone ?? '' },
-        { header: t('colUniversity'), value: (row) => row.university },
-        { header: t('colLevel'), value: (row) => t(LEVEL_KEYS[row.level]) },
-      ]);
-      downloadCsv('8squared-directory.csv', csv);
+      downloadCsv('8squared-directory.csv', buildCsv(rows, exportColumns()));
+    } catch {
+      setActionError('adminActionError');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    setExporting(true);
+    setActionError(null);
+    try {
+      const rows = await exportMembershipRequests();
+      exportPdfTable({
+        filename: '8squared-directory.pdf',
+        title: t('adminPdfDirectoryTitle'),
+        subtitle: t('adminPdfSubtitle'),
+        columns: exportColumns(),
+        rows,
+      });
     } catch {
       setActionError('adminActionError');
     } finally {
@@ -54,10 +78,16 @@ export function DirectoryPanel() {
           <h2 className="text-2xl">{ar ? 'الأعضاء والطلبات' : 'Members and applicants'}</h2>
           <p className="text-muted">{t('adminRowsTotal', { n: people.length })}</p>
         </div>
-        <button type="button" onClick={handleExport} disabled={exporting} className="btn-primary">
-          <Download className="h-4 w-4" aria-hidden="true" />
-          {exporting ? t('adminExporting') : t('adminExportCsv')}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button type="button" onClick={handleExport} disabled={exporting} className="btn-secondary">
+            <Download className="h-4 w-4" aria-hidden="true" />
+            {exporting ? t('adminExporting') : t('adminExportCsv')}
+          </button>
+          <button type="button" onClick={handleExportPdf} disabled={exporting} className="btn-primary">
+            <FileText className="h-4 w-4" aria-hidden="true" />
+            {t('adminExportPdf')}
+          </button>
+        </div>
       </div>
 
       <div className="space-y-2">

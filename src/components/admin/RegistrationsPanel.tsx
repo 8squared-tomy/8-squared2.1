@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { ArrowLeft, Download, Trash2 } from 'lucide-react';
+import { ArrowLeft, Download, FileText, Trash2 } from 'lucide-react';
 import { AdminPager } from '@/components/admin/AdminPager';
 import { Notice } from '@/components/FormField';
 import { useLanguage } from '@/i18n/LanguageProvider';
@@ -12,6 +12,7 @@ import {
   updateRegistrationStatus,
 } from '@/lib/admin/members';
 import { buildCsv, downloadCsv } from '@/lib/csv';
+import { exportPdfTable } from '@/lib/pdf';
 import { REGISTRATION_STATUS_KEYS } from '@/lib/labels';
 import { useAsyncData } from '@/lib/useAsyncData';
 import type { ClubEvent, EventRegistration, RegistrationStatus } from '@/types/club';
@@ -72,24 +73,46 @@ export function RegistrationsPanel({ event, onBack, readOnly=false }: { event: C
     }
   };
 
+  const exportColumns = () => [
+    { header: t('colName'), value: (row: EventRegistration) => row.full_name },
+    { header: t('colEmail'), value: (row: EventRegistration) => row.email },
+    { header: t('colUniversity'), value: (row: EventRegistration) => row.university },
+    { header: t('colAccommodation'), value: (row: EventRegistration) => (row.needs_accommodation ? t('answerYes') : t('answerNo')) },
+    { header: t('fieldResidence'), value: (row: EventRegistration) => (row.needs_accommodation ? row.residence : '—') },
+    { header: t('fieldBacNumber'), value: (row: EventRegistration) => (row.needs_accommodation ? row.bac_registration_number : '—') },
+    { header: t('colPhone'), value: (row: EventRegistration) => (row.needs_accommodation ? row.phone : '—') },
+    { header: t('colStatus'), value: (row: EventRegistration) => t(REGISTRATION_STATUS_KEYS[row.status]) },
+    { header: t('colDate'), value: (row: EventRegistration) => row.created_at },
+  ];
+
+  const eventSlug = () =>
+    event.title_en.replace(/[^\p{L}\p{N}]+/gu, '-').slice(0, 40) || 'event';
+
   const handleExport = async () => {
     setExporting(true);
     setActionError(null);
     try {
       const rows = await exportRegistrations(event.id);
-      const csv = buildCsv(rows, [
-        { header: t('colName'), value: (row) => row.full_name },
-        { header: t('colEmail'), value: (row) => row.email },
-        { header: t('colUniversity'), value: (row) => row.university },
-        { header: t('colAccommodation'), value: (row) => row.needs_accommodation ? t('answerYes') : t('answerNo') },
-        { header: t('fieldResidence'), value: (row) => row.needs_accommodation ? row.residence : '—' },
-        { header: t('fieldBacNumber'), value: (row) => row.needs_accommodation ? row.bac_registration_number : '—' },
-        { header: t('colPhone'), value: (row) => row.needs_accommodation ? row.phone : '—' },
-        { header: t('colStatus'), value: (row) => t(REGISTRATION_STATUS_KEYS[row.status]) },
-        { header: t('colDate'), value: (row) => row.created_at },
-      ]);
-      const slug = event.title_en.replace(/[^\p{L}\p{N}]+/gu, '-').slice(0, 40) || 'event';
-      downloadCsv(`8squared-${slug}-registrations.csv`, csv);
+      downloadCsv(`8squared-${eventSlug()}-registrations.csv`, buildCsv(rows, exportColumns()));
+    } catch {
+      setActionError('adminActionError');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    setExporting(true);
+    setActionError(null);
+    try {
+      const rows = await exportRegistrations(event.id);
+      exportPdfTable({
+        filename: `8squared-${eventSlug()}-registrations.pdf`,
+        title: `${t('adminPdfRegistrationsTitle')} — ${ar ? event.title_ar || event.title_en : event.title_en}`,
+        subtitle: t('adminPdfSubtitle'),
+        columns: exportColumns(),
+        rows,
+      });
     } catch {
       setActionError('adminActionError');
     } finally {
@@ -119,10 +142,16 @@ export function RegistrationsPanel({ event, onBack, readOnly=false }: { event: C
                 : ''}
           </p>
         </div>
-        <button type="button" onClick={handleExport} disabled={exporting} className="btn-primary">
-          <Download className="h-4 w-4" aria-hidden="true" />
-          {exporting ? t('adminExporting') : t('adminExportCsv')}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button type="button" onClick={handleExport} disabled={exporting} className="btn-secondary">
+            <Download className="h-4 w-4" aria-hidden="true" />
+            {exporting ? t('adminExporting') : t('adminExportCsv')}
+          </button>
+          <button type="button" onClick={handleExportPdf} disabled={exporting} className="btn-primary">
+            <FileText className="h-4 w-4" aria-hidden="true" />
+            {t('adminExportPdf')}
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSearch} role="search" className="flex flex-col gap-3 sm:flex-row sm:items-end">
