@@ -37,6 +37,7 @@ export type ExternalLink = {
   label_en: string;
   label_ar: string | null;
   url: string;
+  platform?: string | null;
   sort_order: number;
   is_active: boolean;
 };

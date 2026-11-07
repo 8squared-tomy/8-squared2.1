@@ -108,7 +108,7 @@ export function RegistrationsPanel({ event, onBack, readOnly=false }: { event: C
       const rows = await exportRegistrations(event.id);
       exportPdfTable({
         filename: `8squared-${eventSlug()}-registrations.pdf`,
-        title: `${t('adminPdfRegistrationsTitle')} — ${ar ? event.title_ar || event.title_en : event.title_en}`,
+        title: `${t('adminPdfRegistrationsTitle')} — ${event.title_en}`,
         subtitle: t('adminPdfSubtitle'),
         columns: exportColumns(),
         rows,

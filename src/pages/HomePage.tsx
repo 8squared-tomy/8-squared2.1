@@ -19,7 +19,7 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
   // LinkedIn / Instagram / Telegram are shown as icons in the footer only, never
   // as text cards among the club's study resources.
   const SOCIAL_PLATFORMS = ['linkedin', 'instagram', 'telegram'];
-  const resourceLinks = (links.data ?? []).filter((link) => !SOCIAL_PLATFORMS.includes(link.platform));
+  const resourceLinks = (links.data ?? []).filter((link) => !SOCIAL_PLATFORMS.includes(link.platform ?? ''));
 
   const getText = (key: string): string => {
     const entry = content.data?.find((item) => item.key === key);
