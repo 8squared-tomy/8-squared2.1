@@ -1,3 +1,4 @@
+import { unlockEditor } from '@/lib/admin/access.functions';
 import { supabase } from '@/lib/supabase';
 
 export async function signInAdmin(email: string, password: string): Promise<void> {

@@ -3,6 +3,7 @@ import { FormField, Notice } from '@/components/FormField';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import type { TranslationKey } from '@/i18n/translations';
 import type { EventState } from '@/lib/events';
+import type { RegistrationStatus } from '@/types/club';
 import { registerForEvent } from '@/lib/publicApi';
 import { normalizeEmail, validateEventRegistration, type EventRegistrationInput, type FieldErrors } from '@/lib/validation';
 
@@ -31,7 +32,7 @@ export function EventRegistrationForm({
   const [form, setForm] = useState<EventRegistrationInput>(EMPTY);
   const [errors, setErrors] = useState<FieldErrors<keyof EventRegistrationInput>>({});
   const [serverError, setServerError] = useState<TranslationKey | null>(null);
-  const [result, setResult] = useState<'confirmed' | 'waitlisted' | null>(null);
+  const [result, setResult] = useState<RegistrationStatus | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   if (state === 'past' || state === 'closed') {
