@@ -1,4 +1,4 @@
-import { n as __toESM } from "../_runtime.mjs";
+import { r as __toESM } from "../_runtime.mjs";
 import { n as require_jsx_runtime, r as require_react } from "../_libs/react+tanstack__react-query.mjs";
 import { t as Button } from "./button-BEg5oiP4.mjs";
 import { n as useLanguage } from "./LanguageProvider-CQ4v6zaN.mjs";

@@ -3,7 +3,6 @@ import { t as createServerRpc } from "./createServerRpc-CxD4EZ5P.mjs";
 import { t as createClient } from "../_libs/supabase__supabase-js.mjs";
 import { t as requireSupabaseAuth } from "./auth-middleware-bot2Ewvl.mjs";
 import { n as objectType, r as stringType } from "../_libs/zod.mjs";
-import processModule from "node:process";
 //#region node_modules/.nitro/vite/services/ssr/assets/access.functions-DgklDXDj.js
 var unlockEditor_createServerFn_handler = createServerRpc({
 	id: "494dd2083725c6ed9f2c918f56f17ada84ee4bbecf6d6f4a1d4edce5296b5adf",
@@ -16,8 +15,8 @@ var unlockEditor = createServerFn({ method: "POST" }).middleware([requireSupabas
 })).handler(unlockEditor_createServerFn_handler, async ({ data, context }) => {
 	const { data: eligible, error } = await context.supabase.rpc("is_editor_identity");
 	if (error || eligible !== true) return { ok: false };
-	const url = processModule.env["SUPABASE_URL"];
-	const key = processModule.env["SUPABASE_PUBLISHABLE_KEY"];
+	const url = process.env["SUPABASE_URL"];
+	const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
 	if (!url || !key) throw Error("Auth unavailable");
 	const client = createClient(url, key, {
 		auth: {

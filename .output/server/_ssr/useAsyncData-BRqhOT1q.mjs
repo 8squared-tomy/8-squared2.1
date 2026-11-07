@@ -1,4 +1,4 @@
-import { n as __toESM } from "../_runtime.mjs";
+import { r as __toESM } from "../_runtime.mjs";
 import { r as require_react } from "../_libs/react+tanstack__react-query.mjs";
 //#region node_modules/.nitro/vite/services/ssr/assets/useAsyncData-BRqhOT1q.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
