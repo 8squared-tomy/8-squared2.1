@@ -493,3 +493,26 @@ option {
     opacity: 0.4;
   }
 }
+/* --- "See upcoming events": a steady gold hover, no colour flip-back ------ */
+.btn-gold-link {
+  color: var(--ink);
+}
+.btn-gold-link:hover,
+.btn-gold-link:focus-visible {
+  color: var(--gold);
+  background-color: color-mix(in srgb, var(--gold) 12%, transparent);
+  text-decoration-color: var(--gold);
+}
+.btn-gold-link svg {
+  color: currentColor;
+  transition: transform 0.2s ease;
+}
+.btn-gold-link:hover svg {
+  transform: translateX(3px);
+}
+:root:not(.dark) .btn-gold-link:hover,
+:root:not(.dark) .btn-gold-link:focus-visible {
+  /* Light mode keeps the same gold instead of washing out on pale surfaces. */
+  color: var(--gold);
+  background-color: color-mix(in srgb, var(--gold) 14%, transparent);
+}
