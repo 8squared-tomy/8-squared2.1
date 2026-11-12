@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { HomePage } from "@/pages/HomePage";
 import { loadHomeData } from "@/lib/home-data";
 
-// Hero image lives in public/hero-chess.jpg (the photographic backdrop actually rendered).
-const COVER_IMAGE = "/hero-chess.jpg";
+// Social/preload card derived from the same 4096px hero artwork (1200x630).
+const COVER_IMAGE = "/og-chess.jpg";
 
 export const Route = createFileRoute("/")({
   // Runs on the server for the first visit, so the HTML already contains the content.
