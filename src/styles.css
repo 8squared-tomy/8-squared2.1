@@ -371,19 +371,19 @@ h1,
   opacity: 0;
 }
 
-.sheet-panel[data-side='start'][data-visible='false'] {
+.sheet-panel[data-side='left'][data-visible='false'] {
   transform: translateX(-100%);
 }
 
-.sheet-panel[data-side='end'][data-visible='false'] {
+.sheet-panel[data-side='right'][data-visible='false'] {
   transform: translateX(100%);
 }
 
-[dir='rtl'] .sheet-panel[data-side='start'][data-visible='false'] {
+[dir='rtl'] .sheet-panel[data-side='left'][data-visible='false'] {
   transform: translateX(100%);
 }
 
-[dir='rtl'] .sheet-panel[data-side='end'][data-visible='false'] {
+[dir='rtl'] .sheet-panel[data-side='right'][data-visible='false'] {
   transform: translateX(-100%);
 }
 
