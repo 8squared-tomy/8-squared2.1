@@ -48,12 +48,12 @@ try {
   const vary = res.headers.get("vary") ?? "";
   const html = await res.text();
 
-  check(res.status === 200, `expected HTTP 200, got ${res.status}`);
+  check(res.status === 200, `expected HTTP 200, got ${res.status} :: ${html.slice(0, 700).replace(/\s+/g, " ")}`);
   check(contentType.includes("text/html"), `expected text/html, got "${contentType}"`);
   check(encoding === "gzip", `expected content-encoding gzip, got "${encoding}"`);
   check(/accept-encoding/i.test(vary), `expected Vary to include accept-encoding, got "${vary}"`);
   check(html.includes("8squared"), "rendered HTML is missing the club name");
-  check(html.length > 5_000, `HTML payload looks empty (${html.length} bytes)`);
+  check(html.length > 5_000, `HTML payload looks empty (${html.length} bytes) :: ${html.slice(0, 700).replace(/\s+/g, " ")}`);
   check(
     /rel="preload"[^>]*hero-chess[^>]*webp|hero-chess[^>]*webp[^>]*rel="preload"/i.test(html),
     "hero image preload link is missing from the server-rendered HTML",
