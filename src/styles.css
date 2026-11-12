@@ -128,8 +128,8 @@ option {
 @layer components {
   .card {
     @apply rounded-xl border border-border bg-surface p-6;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 10px 24px -18px rgb(0 0 0 / 0.35);
-    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    box-shadow: 0 1px 1px rgb(0 0 0 / 0.04), 0 12px 28px -22px rgb(0 0 0 / 0.4);
+    transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
   }
 
   .card-hover:hover {
@@ -163,12 +163,14 @@ option {
   }
 
   .btn-primary {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-gold px-5 text-sm font-semibold text-on-gold transition-colors;
-    box-shadow: 0 10px 22px -16px rgb(0 0 0 / 0.6);
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-5 text-sm font-semibold tracking-wide text-on-gold transition-all;
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+    box-shadow: 0 12px 24px -18px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.18);
   }
 
   .btn-primary:hover {
-    filter: brightness(1.08);
+    filter: brightness(1.06);
+    transform: translateY(-1px);
   }
 
   .btn-secondary {
@@ -259,21 +261,6 @@ option {
     background-color: var(--surface-2);
   }
 
-  .theme-swatch {
-    @apply flex flex-col items-center gap-2 rounded-lg border p-2 text-xs font-semibold transition-colors;
-    border-color: var(--border);
-    background-color: var(--surface);
-    color: var(--ink);
-  }
-
-  .theme-swatch:hover {
-    border-color: var(--gold);
-  }
-
-  .theme-swatch[aria-pressed="true"] {
-    border-color: var(--gold);
-    box-shadow: inset 0 0 0 2px var(--gold);
-  }
 }
 
 @layer base {
@@ -323,4 +310,49 @@ option {
   /* Light mode keeps the same gold instead of washing out on pale surfaces. */
   color: var(--gold);
   background-color: color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+/* --- Layout and finish ---------------------------------------------------- */
+.shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding-inline: 1rem;
+}
+
+@media (min-width: 640px) {
+  .shell {
+    padding-inline: 1.5rem;
+  }
+}
+
+/* Inset gold hairline that frames the hero like a tournament board. */
+.hero-frame {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cover-accent) 20%, transparent);
+}
+
+/* Thin gold cap that lights up on hover. */
+.card-accent {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-accent::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity 200ms ease;
+}
+
+.card-accent:hover::before {
+  opacity: 1;
+}
+
+h1,
+.section-title {
+  text-wrap: balance;
 }

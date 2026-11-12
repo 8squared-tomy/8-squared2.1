@@ -10,6 +10,14 @@ export function SiteLayout({ path, children }: { path: string; children: ReactNo
   const logoUrl = useSiteLogo();
   const year = new Date().getFullYear();
 
+  const footerLinks = [
+    { href: '/', label: t('navHome') },
+    { href: '/membership', label: t('navMembership') },
+    { href: '/events', label: t('navEvents') },
+    { href: '/sponsors', label: t('navSponsors') },
+    { href: '/terms', label: t('navLegal') },
+  ];
+
   return (
     <div className="flex min-h-screen flex-col bg-app text-ink">
       <a
@@ -22,32 +30,49 @@ export function SiteLayout({ path, children }: { path: string; children: ReactNo
       <main id="main" className="flex-1">
         {children}
       </main>
+
       <footer className="border-t border-border bg-surface">
-        <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-2">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <SiteLogo url={logoUrl} className="h-6 w-6" />
-              <span className="font-bold text-gold">{t('brand')}</span>
-            </div>
-            <p className="max-w-sm text-muted">{t('footerTagline')}</p>
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.5fr_1fr_1fr]">
+          <div className="space-y-4">
+            <a href="/" className="inline-flex items-center gap-3" aria-label={t('brand')}>
+              <SiteLogo url={logoUrl} className="h-9 w-9" />
+              <span className="text-lg font-bold tracking-wide text-gold">{t('brand')}</span>
+            </a>
+            <p className="max-w-xs text-sm leading-relaxed text-muted">{t('footerTagline')}</p>
+            <div className="section-rule" aria-hidden="true" />
           </div>
-          <nav aria-label={t('footerNav')} className="md:justify-self-end">
-            <ul className="grid grid-cols-2 gap-x-8 gap-y-2">
-              <li><a className="inline-flex min-h-11 items-center hover:text-gold" href="/">{t('navHome')}</a></li>
-              <li><a className="inline-flex min-h-11 items-center hover:text-gold" href="/membership">{t('navMembership')}</a></li>
-              <li><a className="inline-flex min-h-11 items-center hover:text-gold" href="/events">{t('navEvents')}</a></li>
-              <li><a className="inline-flex min-h-11 items-center hover:text-gold" href="/sponsors">{t('navSponsors')}</a></li>
-              <li><a className="inline-flex min-h-11 items-center hover:text-gold" href="/terms">{t('navLegal')}</a></li>
+
+          <nav aria-label={t('footerNav')}>
+            <h2 className="eyebrow mb-4">{t('footerNav')}</h2>
+            <ul className="space-y-1">
+              {footerLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className="inline-flex min-h-10 items-center text-sm text-muted transition-colors hover:text-gold"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
+
+          {/* Social platforms live here only, as icons, at the bottom of the page. */}
+          <div>
+            <h2 className="eyebrow mb-4">{t('footerFollow')}</h2>
+            <SocialLinks />
+          </div>
         </div>
-        {/* Social platforms live here only, as icons, at the very bottom of the page. */}
-        <div className="border-t border-border px-4 py-5 sm:px-6">
-          <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
+
+        <div className="border-t border-border">
+          <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 py-5 text-center sm:flex-row sm:justify-between sm:px-6 sm:text-start">
             <p className="text-sm text-muted">
               © {year} {t('brand')}. {t('footerRights')}
             </p>
-            <SocialLinks />
+            <a href="/terms" className="text-sm text-muted transition-colors hover:text-gold">
+              {t('navLegal')}
+            </a>
           </div>
         </div>
       </footer>
