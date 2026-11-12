@@ -1,5 +1,7 @@
 import "./lib/error-capture";
 
+import { brotliCompressSync, gzipSync, constants as zlibConstants } from "node:zlib";
+
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -44,12 +46,58 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// Nitro's node-server preset does not compress responses, so a 650KB client bundle
+// was reaching browsers uncompressed. Brotli/gzip here keeps transfer sizes at
+// roughly a quarter without touching the build pipeline.
+const COMPRESSIBLE_CONTENT = /^(?:text\/|application\/(?:json|javascript|xml|manifest\+json|ld\+json)|image\/svg\+xml)/i;
+const MIN_COMPRESS_BYTES = 1024;
+
+function appendVary(existing: string | null, value: string): string {
+  if (!existing) return value;
+  const parts = existing.split(",").map((part) => part.trim().toLowerCase());
+  return parts.includes(value) ? existing : `${existing}, ${value}`;
+}
+
+async function compressResponse(request: Request, response: Response): Promise<Response> {
+  if (request.method === "HEAD") return response;
+  if (response.status === 204 || response.status === 304) return response;
+  if (response.headers.has("content-encoding")) return response;
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!COMPRESSIBLE_CONTENT.test(contentType)) return response;
+
+  const acceptEncoding = request.headers.get("accept-encoding") ?? "";
+  const useBrotli = /\bbr\b/.test(acceptEncoding);
+  const useGzip = !useBrotli && /\bgzip\b/.test(acceptEncoding);
+  if (!useBrotli && !useGzip) return response;
+
+  const body = Buffer.from(await response.arrayBuffer());
+  if (body.byteLength < MIN_COMPRESS_BYTES) return response;
+
+  const compressed = useBrotli
+    ? brotliCompressSync(body, { params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 5 } })
+    : gzipSync(body, { level: 6 });
+  if (compressed.byteLength >= body.byteLength) return response;
+
+  const headers = new Headers(response.headers);
+  headers.set("content-encoding", useBrotli ? "br" : "gzip");
+  headers.set("vary", appendVary(headers.get("vary"), "accept-encoding"));
+  headers.delete("content-length");
+
+  return new Response(compressed, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const normalized = await normalizeCatastrophicSsrResponse(response);
+      return await compressResponse(request, normalized);
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
