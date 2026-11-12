@@ -4,6 +4,32 @@ import { useState } from 'react';
 export const DEFAULT_LOGO_SRC = '/club-logo.jpg';
 
 /**
+ * Gold line-art crown used in the header lockup when no custom logo is set.
+ * Matches the crest on the club's reference artwork.
+ */
+export function CrownMark({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 48 40"
+      className={`shrink-0 ${className ?? ''}`}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M7 13l7 7 11-13 11 13 7-7-4 19H11z" />
+      <path d="M11 36h26" />
+      <circle cx="7" cy="11" r="2.1" />
+      <circle cx="25" cy="5" r="2.1" />
+      <circle cx="43" cy="11" r="2.1" />
+    </svg>
+  );
+}
+
+/**
  * Renders the club logo. A configured logo (https URL or uploaded data URL)
  * wins; otherwise the club crest image is used. If the image cannot load we
  * fall back to the inline crown mark so the header never shows a broken image.

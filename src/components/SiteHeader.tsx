@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Globe, Menu, Home, Users, Trophy, Shield, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { AccessibilityMenu } from '@/components/AccessibilityMenu';
-import { SiteLogo } from '@/components/SiteLogo';
+import { SiteLogo, CrownMark } from '@/components/SiteLogo';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { usePreferences } from '@/preferences/PreferencesProvider';
 
@@ -11,8 +11,25 @@ export function SiteHeader({ path, logoUrl }: { path: string; logoUrl: string | 
   const { t, language, setLanguage } = useLanguage();
   const { theme, setTheme } = usePreferences();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const side = language === 'ar' ? 'right' : 'left';
   const dark = theme === 'dark';
+  const isHome = path === '/';
+
+  // On the home page the bar floats transparently over the hero art and only
+  // turns solid once the reader leaves the top of the page.
+  const overlay = isHome && !scrolled;
+
+  useEffect(() => {
+    if (!isHome) {
+      setScrolled(true);
+      return;
+    }
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isHome]);
 
   const items = [
     { href: '/', label: t('navHome'), icon: Home },
@@ -22,35 +39,71 @@ export function SiteHeader({ path, logoUrl }: { path: string; logoUrl: string | 
   ];
 
   return (
-    // Solid background (no backdrop-filter): a blurred header both let the page
-    // show through and trapped the fixed menu overlay inside its own box.
-    <header className="sticky top-0 z-50 border-b border-border bg-surface shadow-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-1 sm:px-6">
-        <a href="/" className="flex min-h-11 items-center gap-3 self-start py-1" aria-label={t('brand')}>
-          {/* The crest sits large against the top edge of the bar. */}
-          <SiteLogo url={logoUrl} className="h-12 w-12 shrink-0 drop-shadow-sm sm:h-14 sm:w-14" />
-          <span className="leading-tight">
-            <span className="block text-lg font-bold text-gold sm:text-xl">{t('brand')}</span>
-            <span className="block text-[0.7rem] text-muted sm:text-xs">{t('brandTagline')}</span>
+    // Solid background once scrolled (no backdrop-filter): a blurred header
+    // both let the page show through and trapped the fixed menu overlay inside
+    // its own box.
+    <header
+      className={`${isHome ? 'fixed' : 'sticky'} inset-x-0 top-0 z-50 transition-colors duration-300 ${
+        overlay
+          ? 'border-b border-transparent bg-transparent'
+          : 'border-b border-border bg-surface shadow-sm'
+      }`}
+    >
+      <div
+        className={`mx-auto flex max-w-6xl items-start justify-between gap-3 px-4 sm:px-6 ${
+          overlay ? 'py-4 sm:py-5' : 'py-2'
+        }`}
+      >
+        {/* Stacked gold lockup: crown mark, club name, then the tagline. */}
+        <a
+          href="/"
+          className="flex flex-col items-start gap-1"
+          aria-label={t('brand')}
+        >
+          {logoUrl ? (
+            <SiteLogo url={logoUrl} className="h-9 w-9" />
+          ) : (
+            <CrownMark className={`h-8 w-10 ${overlay ? 'text-cover-accent' : 'text-gold'}`} />
+          )}
+          <span
+            className={`text-lg font-bold leading-none tracking-tight ${
+              overlay ? 'text-cover-accent' : 'text-gold'
+            }`}
+          >
+            {t('brand')}
+          </span>
+          <span
+            className={`text-[0.6rem] uppercase leading-none tracking-[0.3em] ${
+              overlay ? 'text-cover-accent/80' : 'text-muted'
+            }`}
+          >
+            {t('brandTagline')}
           </span>
         </a>
 
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="min-h-11 min-w-11"
-            onClick={() => setTheme(dark ? 'light' : 'dark')}
-            aria-label={dark ? t('themeLight') : t('themeDark')}
-            title={dark ? t('themeLight') : t('themeDark')}
-          >
-            <Sun className="hidden h-5 w-5 dark:block" aria-hidden="true" />
-            <Moon className="h-5 w-5 dark:hidden" aria-hidden="true" />
-          </Button>
+          {!overlay && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="min-h-11 min-w-11"
+              onClick={() => setTheme(dark ? 'light' : 'dark')}
+              aria-label={dark ? t('themeLight') : t('themeDark')}
+              title={dark ? t('themeLight') : t('themeDark')}
+            >
+              <Sun className="hidden h-5 w-5 dark:block" aria-hidden="true" />
+              <Moon className="h-5 w-5 dark:hidden" aria-hidden="true" />
+            </Button>
+          )}
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="min-h-11 min-w-11" aria-label={t('openMenu')}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`min-h-11 min-w-11 ${overlay ? 'text-on-cover hover:bg-white/10' : ''}`}
+                aria-label={t('openMenu')}
+              >
                 <Menu />
               </Button>
             </SheetTrigger>

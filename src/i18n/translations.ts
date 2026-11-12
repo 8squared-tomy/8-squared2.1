@@ -71,6 +71,7 @@ export const en = {
   notFoundBody: 'The page you are looking for does not exist.',
   backHome: 'Back to home',
   footerTagline: 'A chess community for students and players of every level.',
+  footerHeadline: 'A club built on eight squares.',
   footerNav: 'Quick links',
   footerRights: 'All rights reserved.',
 
@@ -418,6 +419,7 @@ export const ar: Record<TranslationKey, string> = {
   notFoundBody: 'الصفحة التي تبحث عنها غير موجودة.',
   backHome: 'العودة إلى الرئيسية',
   footerTagline: 'مجتمع شطرنج للطلاب ولاعبي كل المستويات.',
+  footerHeadline: 'نادٍ مبنيّ على أربعة وستّين مربّعًا.',
   footerNav: 'روابط سريعة',
   footerRights: 'جميع الحقوق محفوظة.',
 

@@ -1,14 +1,11 @@
 import { ArrowRight, Shield, Trophy, Users } from 'lucide-react';
 import { EventCard } from '@/components/EventCard';
+import { HeroBackdrop } from '@/components/HeroBackdrop';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { useRouter } from '@tanstack/react-router';
 import type { HomeData } from '@/lib/home-data';
 import { Notice } from '@/components/FormField';
-import { Button } from '@/components/ui/button';
 import { MemberCarousel } from '@/components/MemberCarousel';
-
-// Hero image lives in public/chess-cover.jpg. Replace the file to change the picture.
-const COVER_IMAGE = '/chess-cover.jpg';
 
 export function HomePage({ loaded }: { loaded: HomeData }) {
   const { t, pick } = useLanguage();
@@ -26,6 +23,9 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
     return entry ? pick(entry.value_en, entry.value_ar) : '';
   };
 
+  const headline = getText('hero_title') || `${t('brand')} ${t('brandTagline')}`;
+  const subhead = getText('hero_subtitle') || t('footerTagline');
+
   const upcoming = (events.data?.events ?? [])
     .filter((event) => new Date(event.ends_at ?? event.starts_at).getTime() >= Date.now())
     .slice(0, 3);
@@ -42,71 +42,33 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
 
   return (
     <>
-      {/* Hero: dark lacquer board, framed in a gold hairline, with the club promise. */}
-      <section className="relative isolate overflow-hidden bg-cover text-on-cover">
-        <img
-          src={COVER_IMAGE}
-          alt={t('heroImageAlt')}
-          className="absolute inset-0 -z-20 h-full w-full object-cover"
-          width={940}
-          height={650}
-          fetchPriority="high"
-        />
-        <div
-          className="absolute inset-0 -z-10 bg-gradient-to-br from-cover/95 via-cover/85 to-cover"
-          aria-hidden="true"
-        />
-        <div className="board-pattern absolute inset-0 -z-10 opacity-25" aria-hidden="true" />
-        <div className="hero-frame absolute inset-4 -z-10 hidden rounded-2xl lg:block" aria-hidden="true" />
+      {/* Hero: charcoal field with blurred chess silhouettes, the club promise
+          set left in heavy sans, and the two reference calls to action. */}
+      <section className="relative isolate overflow-hidden bg-[#101010] text-on-cover">
+        <HeroBackdrop />
 
-        <div className="mx-auto flex min-h-[80vh] max-w-6xl flex-col justify-center px-4 py-24 sm:px-6">
-          <div className="max-w-3xl space-y-7">
-            <div className="flex items-center gap-3">
-              <span className="h-px w-12 bg-cover-accent" aria-hidden="true" />
-              <p className="eyebrow text-cover-accent">{t('heroEyebrow')}</p>
-            </div>
+        <div className="relative mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col justify-center px-4 pb-24 pt-40 sm:px-6 sm:pt-44">
+          <div className="max-w-2xl">
+            <p className="hero-eyebrow">{t('heroEyebrow')}</p>
 
-            <h1 className="slogan-display text-4xl text-on-cover sm:text-6xl lg:text-7xl">
-              {getText('hero_title') || t('brand')}
-            </h1>
+            <h1 className="hero-title mt-6">{headline}</h1>
 
-            <p className="max-w-2xl text-lg leading-relaxed text-on-cover/85">
-              {getText('hero_subtitle')}
-            </p>
+            <p className="mt-7 max-w-xl text-lg leading-relaxed text-on-cover/70">{subhead}</p>
 
-            <div className="flex flex-col gap-3 pt-1 sm:flex-row">
-              <a href="/membership" className="btn-primary px-6">
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <a href="/membership" className="hero-btn hero-btn-gold">
                 {t('heroCtaJoin')}
                 <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
               </a>
-              <Button
-                asChild
-                variant="outline"
-                className="btn-secondary h-auto border-on-cover/35 bg-transparent px-6 text-on-cover hover:border-cover-accent hover:bg-cover-accent/10 hover:text-cover-accent"
-              >
-                <a href="/events">{t('heroCtaEvents')}</a>
-              </Button>
+              <a href="/events" className="hero-btn hero-btn-outline">
+                {t('heroCtaEvents')}
+              </a>
             </div>
           </div>
-
-          <dl className="mt-16 grid max-w-md grid-cols-2 overflow-hidden rounded-xl border border-on-cover/15 bg-on-cover/[0.06] backdrop-blur-sm">
-            <div className="border-e border-on-cover/15 px-6 py-4">
-              <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-on-cover/60">
-                {t('statMembers')}
-              </dt>
-              <dd className="mt-1 text-3xl font-bold text-cover-accent">{memberCount}</dd>
-            </div>
-            <div className="px-6 py-4">
-              <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-on-cover/60">
-                {t('statUpcoming')}
-              </dt>
-              <dd className="mt-1 text-3xl font-bold text-cover-accent">{upcomingCount}</dd>
-            </div>
-          </dl>
         </div>
       </section>
 
-      {/* About: quiet two-column editorial block. */}
+      {/* About: quiet two-column editorial block with the club numbers. */}
       <section className="shell py-20 sm:py-24">
         <div className="grid gap-10 md:grid-cols-[0.9fr_1.1fr] md:items-start md:gap-16">
           <div className="space-y-4">
@@ -114,7 +76,25 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
             <h2 className="text-3xl sm:text-4xl">{t('aboutTitle')}</h2>
             <div className="section-rule" aria-hidden="true" />
           </div>
-          <p className="text-lg leading-relaxed text-muted md:pt-1">{getText('about_body')}</p>
+
+          <div className="space-y-9">
+            <p className="text-lg leading-relaxed text-muted md:pt-1">{getText('about_body')}</p>
+
+            <dl className="flex flex-wrap gap-x-14 gap-y-6">
+              <div>
+                <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted">
+                  {t('statMembers')}
+                </dt>
+                <dd className="mt-1 text-3xl font-bold text-gold">{memberCount}</dd>
+              </div>
+              <div>
+                <dt className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-muted">
+                  {t('statUpcoming')}
+                </dt>
+                <dd className="mt-1 text-3xl font-bold text-gold">{upcomingCount}</dd>
+              </div>
+            </dl>
+          </div>
         </div>
 
         <div className="mt-14 grid gap-5 md:grid-cols-3">

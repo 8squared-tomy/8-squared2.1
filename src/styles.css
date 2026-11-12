@@ -432,3 +432,69 @@ h1,
     transform: translateY(0);
   }
 }
+
+/* ---- Reference hero styling ---------------------------------------------
+   Charcoal field, gold tracked eyebrow, heavy sans headline and the two
+   square-cornered calls to action from the club's design reference. */
+.hero-backdrop {
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--cover-accent);
+}
+
+.hero-title {
+  font-family: var(--font-sans);
+  font-size: clamp(2.7rem, 6.4vw, 4.75rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  text-wrap: balance;
+  text-shadow: 0 18px 60px rgb(0 0 0 / 0.55);
+}
+
+.hero-btn {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 4px;
+  padding-inline: 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    filter 180ms ease;
+}
+
+.hero-btn-gold {
+  background: var(--cover-accent);
+  color: #14110a;
+  box-shadow: 0 18px 40px -24px rgb(0 0 0 / 0.9);
+}
+
+.hero-btn-gold:hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+
+.hero-btn-outline {
+  border: 1px solid rgb(255 255 255 / 0.55);
+  color: #ffffff;
+  background: transparent;
+}
+
+.hero-btn-outline:hover {
+  border-color: var(--cover-accent);
+  color: var(--cover-accent);
+}

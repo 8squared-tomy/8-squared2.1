@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
 import { SiteHeader } from '@/components/SiteHeader';
-import { SiteLogo } from '@/components/SiteLogo';
-import { useLanguage } from '@/i18n/LanguageProvider';
 import { useSiteLogo } from '@/lib/useSiteLogo';
 import { SocialLinks } from '@/components/SocialLinks';
 
@@ -31,46 +29,51 @@ export function SiteLayout({ path, children }: { path: string; children: ReactNo
         {children}
       </main>
 
-      <footer className="border-t border-border bg-surface">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-[1.5fr_1fr_1fr]">
-          <div className="space-y-4">
-            <a href="/" className="inline-flex items-center gap-3" aria-label={t('brand')}>
-              <SiteLogo url={logoUrl} className="h-9 w-9" />
-              <span className="text-lg font-bold tracking-wide text-gold">{t('brand')}</span>
-            </a>
-            <p className="max-w-xs text-sm leading-relaxed text-muted">{t('footerTagline')}</p>
-            <div className="section-rule" aria-hidden="true" />
+      {/* Footer: solid charcoal block, gold lockup on the left, copy on the right. */}
+      <footer className="bg-[#0d0d0d] text-[#c4c4c4]">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+          <div className="grid gap-12 md:grid-cols-2 md:gap-16">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.32em] text-cover-accent">
+                {t('brand')}
+              </p>
+              <div className="mt-6 h-px w-full bg-white/10" aria-hidden="true" />
+              <p className="mt-6 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
+                {t('footerHeadline')}
+              </p>
+            </div>
+
+            <div className="space-y-7">
+              <p className="max-w-md text-base leading-relaxed">{t('footerTagline')}</p>
+
+              <nav aria-label={t('footerNav')}>
+                <ul className="flex flex-wrap gap-x-6 gap-y-2">
+                  {footerLinks.map((link) => (
+                    <li key={link.href}>
+                      <a
+                        href={link.href}
+                        className="inline-flex min-h-9 items-center text-sm text-white/70 transition-colors hover:text-cover-accent"
+                      >
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              {/* Social platforms live here only, as icons, at the bottom of the page. */}
+              <div>
+                <h2 className="sr-only">{t('footerFollow')}</h2>
+                <SocialLinks />
+              </div>
+            </div>
           </div>
 
-          <nav aria-label={t('footerNav')}>
-            <h2 className="eyebrow mb-4">{t('footerNav')}</h2>
-            <ul className="space-y-1">
-              {footerLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="inline-flex min-h-10 items-center text-sm text-muted transition-colors hover:text-gold"
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-
-          {/* Social platforms live here only, as icons, at the bottom of the page. */}
-          <div>
-            <h2 className="eyebrow mb-4">{t('footerFollow')}</h2>
-            <SocialLinks />
-          </div>
-        </div>
-
-        <div className="border-t border-border">
-          <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 px-4 py-5 text-center sm:flex-row sm:justify-between sm:px-6 sm:text-start">
-            <p className="text-sm text-muted">
+          <div className="mt-14 flex flex-col gap-2 border-t border-white/10 pt-6 text-xs text-white/45 sm:flex-row sm:items-center sm:justify-between">
+            <p>
               © {year} {t('brand')}. {t('footerRights')}
             </p>
-            <a href="/terms" className="text-sm text-muted transition-colors hover:text-gold">
+            <a href="/terms" className="transition-colors hover:text-cover-accent">
               {t('navLegal')}
             </a>
           </div>
