@@ -68,8 +68,33 @@ export function SheetContent({
   const panel = useRef<HTMLDivElement>(null);
   const close = useCallback(() => onOpenChange(false), [onOpenChange]);
   const [mounted, setMounted] = useState(false);
+  const [rendered, setRendered] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  /**
+   * The panel stays mounted while it slides out, so opening and closing read as
+   * one smooth motion instead of an instant swap. CSS owns the timing (see
+   * .sheet-panel in styles.css); this only flips the visibility flag.
+   */
+  useEffect(() => {
+    if (!mounted) return;
+    if (open) {
+      setRendered(true);
+      const enter = window.setTimeout(() => {
+        setVisible(true);
+        const focusable = panel.current?.querySelector<HTMLElement>(
+          'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        focusable?.focus();
+      }, 20);
+      return () => window.clearTimeout(enter);
+    }
+    setVisible(false);
+    const exit = window.setTimeout(() => setRendered(false), 360);
+    return () => window.clearTimeout(exit);
+  }, [open, mounted]);
 
   useEffect(() => {
     if (!open) return;
@@ -80,8 +105,6 @@ export function SheetContent({
     const previousOverflow = document.body.style.overflow;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     document.body.style.overflow = 'hidden';
-    const focusable = panel.current?.querySelector<HTMLElement>('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    focusable?.focus();
     return () => {
       document.removeEventListener('keydown', onKeyDown);
       document.body.style.overflow = previousOverflow;
@@ -89,19 +112,26 @@ export function SheetContent({
     };
   }, [open, close]);
 
-  if (!open || !mounted) return null;
+  if (!mounted || !rendered) return null;
 
   // Portalled to <body>: the header uses sticky positioning and previously
   // trapped this fixed overlay inside its own box, so the menu could not paint.
   return createPortal(
     <div className="fixed inset-0 z-[100]">
-      <div className="absolute inset-0 bg-black/60" aria-hidden="true" onClick={close} />
+      <div
+        className="sheet-backdrop absolute inset-0 bg-black/60"
+        data-visible={visible ? 'true' : 'false'}
+        aria-hidden="true"
+        onClick={close}
+      />
       <div
         ref={panel}
         role="dialog"
         aria-modal="true"
+        data-side={side}
+        data-visible={visible ? 'true' : 'false'}
         className={cn(
-          'absolute inset-y-0 flex w-[min(22rem,88vw)] flex-col bg-surface shadow-2xl',
+          'sheet-panel absolute inset-y-0 flex w-[min(22rem,88vw)] flex-col bg-surface shadow-2xl',
           side === 'right' ? 'end-0' : 'start-0',
           className,
         )}

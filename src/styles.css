@@ -356,3 +356,79 @@ h1,
 .section-title {
   text-wrap: balance;
 }
+
+/* ---- Sidebar menu motion -------------------------------------------------
+   The panel slides in from its own edge while the backdrop fades, so the menu
+   arrives instead of popping. Opening and closing share one duration. */
+.sheet-panel {
+  transition:
+    transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 340ms ease;
+  will-change: transform;
+}
+
+.sheet-panel[data-visible='false'] {
+  opacity: 0;
+}
+
+.sheet-panel[data-side='start'][data-visible='false'] {
+  transform: translateX(-100%);
+}
+
+.sheet-panel[data-side='end'][data-visible='false'] {
+  transform: translateX(100%);
+}
+
+[dir='rtl'] .sheet-panel[data-side='start'][data-visible='false'] {
+  transform: translateX(100%);
+}
+
+[dir='rtl'] .sheet-panel[data-side='end'][data-visible='false'] {
+  transform: translateX(-100%);
+}
+
+.sheet-panel[data-visible='true'] {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.sheet-backdrop {
+  opacity: 0;
+  transition: opacity 340ms ease;
+}
+
+.sheet-backdrop[data-visible='true'] {
+  opacity: 1;
+}
+
+/* Menu rows settle in just after the panel for a calm entrance. */
+.sheet-panel[data-visible='true'] nav li {
+  animation: sheet-row-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sheet-panel[data-visible='true'] nav li:nth-child(1) {
+  animation-delay: 70ms;
+}
+
+.sheet-panel[data-visible='true'] nav li:nth-child(2) {
+  animation-delay: 120ms;
+}
+
+.sheet-panel[data-visible='true'] nav li:nth-child(3) {
+  animation-delay: 170ms;
+}
+
+.sheet-panel[data-visible='true'] nav li:nth-child(4) {
+  animation-delay: 220ms;
+}
+
+@keyframes sheet-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
