@@ -18,7 +18,8 @@ ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOST=0.0.0.0
 
-RUN apk upgrade --no-cache
+# The date keys the build cache so this layer installs today's OS fixes; AppJet keeps it current on deploy.
+RUN echo "os-refresh 2026-11-12" && apk upgrade --no-cache
 COPY --from=build /app/.output ./.output
 
 EXPOSE 3000

@@ -72,6 +72,39 @@ try {
     await dialog.waitFor({ state: 'visible', timeout: 10000 });
     notes.menuOpened = true;
 
+    // The panel should slide in, not pop: CSS owns the timing, so assert the
+    // computed transition exists and that the panel settles at its rest spot.
+    const reducedMotion = await page.evaluate(
+      () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    );
+    notes.reducedMotion = reducedMotion;
+    notes.sheetTransition = await dialog.evaluate((el) => getComputedStyle(el).transitionDuration);
+    notes.backdropTransition = await page
+      .locator('.sheet-backdrop')
+      .first()
+      .evaluate((el) => getComputedStyle(el).transitionDuration)
+      .catch(() => null);
+    notes.sheetStartTransform = await dialog.evaluate((el) => getComputedStyle(el).transform);
+    await page.waitForTimeout(520);
+    notes.sheetSettledTransform = await dialog.evaluate((el) => getComputedStyle(el).transform);
+    notes.sheetSlidIn = notes.sheetStartTransform !== notes.sheetSettledTransform;
+
+    if (!reducedMotion) {
+      check(
+        parseFloat(notes.sheetTransition) > 0.05,
+        `menu panel should animate, got transition-duration "${notes.sheetTransition}"`,
+      );
+      check(
+        Number(notes.backdropTransition?.replace(/[^0-9.]/g, '') ?? 0) > 0.05,
+        `menu backdrop should fade, got transition-duration "${notes.backdropTransition}"`,
+      );
+      check(
+        notes.sheetSettledTransform === 'none' ||
+          notes.sheetSettledTransform === 'matrix(1, 0, 0, 1, 0, 0)',
+        `menu panel should settle in place, got "${notes.sheetSettledTransform}"`,
+      );
+    }
+
     // Theme choices sit behind the collapsible "Accessibility" section.
     const accessToggle = dialog
       .locator('button', { hasText: /accessibility|إمكانية الوصول|سهولة الوصول/i })
