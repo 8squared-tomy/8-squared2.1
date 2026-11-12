@@ -1,7 +1,5 @@
 import "./lib/error-capture";
 
-import { brotliCompressSync, gzipSync, constants as zlibConstants } from "node:zlib";
-
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
@@ -66,25 +64,21 @@ async function compressResponse(request: Request, response: Response): Promise<R
   const contentType = response.headers.get("content-type") ?? "";
   if (!COMPRESSIBLE_CONTENT.test(contentType)) return response;
 
+  const declaredLength = Number(response.headers.get("content-length") ?? "0");
+  if (declaredLength > 0 && declaredLength < MIN_COMPRESS_BYTES) return response;
+  if (!response.body) return response;
+
   const acceptEncoding = request.headers.get("accept-encoding") ?? "";
-  const useBrotli = /\bbr\b/.test(acceptEncoding);
-  const useGzip = !useBrotli && /\bgzip\b/.test(acceptEncoding);
-  if (!useBrotli && !useGzip) return response;
-
-  const body = Buffer.from(await response.arrayBuffer());
-  if (body.byteLength < MIN_COMPRESS_BYTES) return response;
-
-  const compressed = useBrotli
-    ? brotliCompressSync(body, { params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 5 } })
-    : gzipSync(body, { level: 6 });
-  if (compressed.byteLength >= body.byteLength) return response;
+  if (!/\bgzip\b/.test(acceptEncoding)) return response;
 
   const headers = new Headers(response.headers);
-  headers.set("content-encoding", useBrotli ? "br" : "gzip");
+  headers.set("content-encoding", "gzip");
   headers.set("vary", appendVary(headers.get("vary"), "accept-encoding"));
   headers.delete("content-length");
 
-  return new Response(compressed, {
+  // Streaming gzip: the shell reaches the browser immediately instead of waiting
+  // for the whole document to render, so first paint is not delayed.
+  return new Response(response.body.pipeThrough(new CompressionStream("gzip")), {
     status: response.status,
     statusText: response.statusText,
     headers,

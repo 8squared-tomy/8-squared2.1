@@ -9,7 +9,34 @@ export const Route = createFileRoute("/")({
   // Runs on the server for the first visit, so the HTML already contains the content.
   loader: () => loadHomeData(),
   head: () => ({
-    links: [{ rel: "preload", as: "image", href: COVER_IMAGE, fetchPriority: "high" }],
+    links: [
+      // The hero artwork is the largest above-the-fold paint; preloading the exact
+      // file each breakpoint uses lets it start downloading with the document.
+      {
+        rel: "preload",
+        as: "image",
+        href: "/hero-chess-portrait.webp",
+        type: "image/webp",
+        media: "(max-width: 767px)",
+        fetchPriority: "high",
+      },
+      {
+        rel: "preload",
+        as: "image",
+        href: "/hero-chess-1600.webp",
+        type: "image/webp",
+        media: "(min-width: 768px) and (max-width: 1279px)",
+        fetchPriority: "high",
+      },
+      {
+        rel: "preload",
+        as: "image",
+        href: "/hero-chess-2560.webp",
+        type: "image/webp",
+        media: "(min-width: 1280px)",
+        fetchPriority: "high",
+      },
+    ],
     meta: [
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
