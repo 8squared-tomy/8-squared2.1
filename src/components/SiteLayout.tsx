@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { SiteHeader } from '@/components/SiteHeader';
+import { useLanguage } from '@/i18n/LanguageProvider';
 import { useSiteLogo } from '@/lib/useSiteLogo';
 import { SocialLinks } from '@/components/SocialLinks';
 
