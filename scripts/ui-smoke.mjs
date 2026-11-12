@@ -47,9 +47,12 @@ try {
   check(notes.pillarCards >= 3, `expected 3 pillar cards, found ${notes.pillarCards}`);
 
   // 3. Footer social icons stay at the bottom of the page.
-  notes.socialLinks = await page.locator(
+  // Social icons are fetched after hydration, so give them time before counting.
+  const socials = page.locator(
     'footer a[href*="linkedin"], footer a[href*="instagram"], footer a[href*="telegram"]',
-  ).count();
+  );
+  await socials.first().waitFor({ state: 'attached', timeout: 15000 }).catch(() => {});
+  notes.socialLinks = await socials.count();
   check(notes.socialLinks >= 3, `expected 3 footer social links, found ${notes.socialLinks}`);
 
   // 4. Palette: one gold token, no board-theme switching left in the menu.
@@ -68,11 +71,22 @@ try {
     const dialog = page.locator('[role="dialog"]').first();
     await dialog.waitFor({ state: 'visible', timeout: 10000 });
     notes.menuOpened = true;
+
+    // Theme choices sit behind the collapsible "Accessibility" section.
+    const accessToggle = dialog
+      .locator('button', { hasText: /accessibility|إمكانية الوصول|سهولة الوصول/i })
+      .first();
+    if ((await accessToggle.count()) > 0) {
+      await accessToggle.click();
+      await page.waitForTimeout(400);
+    }
+    notes.accessSectionOpen = (await dialog.locator('button[aria-pressed]').count()) > 0;
+
     const dialogText = await dialog.innerText();
     notes.boardThemeMentions = /board theme|ثيم الرقعة|walnut|marble|midnight|emerald|الجوز|رخام|ملكي|البطولة/i.test(dialogText);
     check(!notes.boardThemeMentions, 'board-theme choices are still offered in the accessibility menu');
     notes.themeChoices = await dialog.locator('button[aria-pressed]').count();
-    check(notes.themeChoices >= 2, `expected theme choices, found ${notes.themeChoices}`);
+    check(notes.themeChoices >= 3, `expected theme/font/contrast choices, found ${notes.themeChoices}`);
     await page.keyboard.press('Escape');
   } else {
     failures.push('accessibility menu trigger not found');
@@ -84,11 +98,14 @@ try {
     const read = () => eventsLink.evaluate((el) => getComputedStyle(el).color);
     notes.linkIdle = await read();
     await eventsLink.hover();
+    // Let the colour transition finish before sampling the hover state.
+    await page.waitForTimeout(700);
     notes.linkHover = await read();
     await page.waitForTimeout(1200);
     notes.linkHoverAfter = await read();
+    check(notes.linkHover !== notes.linkIdle, 'hovering did not change the link colour');
     check(notes.linkHover === notes.linkHoverAfter, 'gold hover colour changed while hovering');
-    notes.hoverIsGold = notes.linkHover === notes.linkHoverAfter;
+    notes.hoverIsSteady = notes.linkHover === notes.linkHoverAfter;
   } else {
     notes.linkIdle = null;
   }
