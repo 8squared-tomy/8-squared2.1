@@ -55,7 +55,7 @@
   --surface-2: var(--surface);
 }
 
- inline {
+@theme inline {
   --color-app: var(--app);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
