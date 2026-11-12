@@ -3,7 +3,7 @@ import { Globe, Menu, Home, Users, Trophy, Shield, Moon, Sun } from 'lucide-reac
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { AccessibilityMenu } from '@/components/AccessibilityMenu';
-import { SiteLogo, CrownMark } from '@/components/SiteLogo';
+import { SiteLogo } from '@/components/SiteLogo';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { usePreferences } from '@/preferences/PreferencesProvider';
 
@@ -60,11 +60,8 @@ export function SiteHeader({ path, logoUrl }: { path: string; logoUrl: string | 
           className="flex flex-col items-start gap-1"
           aria-label={t('brand')}
         >
-          {logoUrl ? (
-            <SiteLogo url={logoUrl} className="h-9 w-9" />
-          ) : (
-            <CrownMark className={`h-8 w-10 ${overlay ? 'text-cover-accent' : 'text-gold'}`} />
-          )}
+          {/* The club's own crest, always: no drawn stand-in. */}
+          <SiteLogo url={logoUrl} className="h-11 w-11 rounded-md" />
           <span
             className={`text-lg font-bold leading-none tracking-tight ${
               overlay ? 'text-cover-accent' : 'text-gold'
