@@ -25,12 +25,13 @@ export function SiteHeader({ path, logoUrl }: { path: string; logoUrl: string | 
     // Solid background (no backdrop-filter): a blurred header both let the page
     // show through and trapped the fixed menu overlay inside its own box.
     <header className="sticky top-0 z-50 border-b border-border bg-surface shadow-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-2 sm:px-6">
-        <a href="/" className="flex min-h-11 items-center gap-2" aria-label={t('brand')}>
-          <SiteLogo url={logoUrl} className="h-6 w-6" />
-          <span>
-            <span className="block text-base font-bold text-gold">{t('brand')}</span>
-            <span className="block text-xs text-muted">{t('brandTagline')}</span>
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-1 sm:px-6">
+        <a href="/" className="flex min-h-11 items-center gap-3 self-start py-1" aria-label={t('brand')}>
+          {/* The crest sits large against the top edge of the bar. */}
+          <SiteLogo url={logoUrl} className="h-12 w-12 shrink-0 drop-shadow-sm sm:h-14 sm:w-14" />
+          <span className="leading-tight">
+            <span className="block text-lg font-bold text-gold sm:text-xl">{t('brand')}</span>
+            <span className="block text-[0.7rem] text-muted sm:text-xs">{t('brandTagline')}</span>
           </span>
         </a>
 
@@ -58,7 +59,7 @@ export function SiteHeader({ path, logoUrl }: { path: string; logoUrl: string | 
               className="flex flex-col gap-0 overflow-hidden border-border bg-surface p-0"
             >
               <div className="flex items-center gap-3 border-b border-border px-6 py-5">
-                <SiteLogo url={logoUrl} className="h-7 w-7" />
+                <SiteLogo url={logoUrl} className="h-10 w-10 shrink-0" />
                 <div className="min-w-0">
                   <SheetTitle className="text-start text-base font-bold text-gold">{t('brand')}</SheetTitle>
                   <p className="text-xs text-muted">{t('brandTagline')}</p>

@@ -6,6 +6,7 @@ import type { HomeData } from '@/lib/home-data';
 import { Notice } from '@/components/FormField';
 import { Button } from '@/components/ui/button';
 import { MemberCarousel } from '@/components/MemberCarousel';
+import { RookBuild } from '@/components/RookBuild';
 
 // Hero image lives in public/chess-cover.jpg. Replace the file to change the picture.
 const COVER_IMAGE = '/chess-cover.jpg';
@@ -43,10 +44,14 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
         />
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-cover/80 via-cover/70 to-cover" aria-hidden="true" />
         <div className="board-pattern absolute inset-0 -z-10 opacity-50" aria-hidden="true" />
+        {/* The crest rook builds itself from the base up, over the board pattern. */}
+        <RookBuild className="absolute bottom-4 end-4 hidden h-52 md:block lg:h-64" />
         <div className="mx-auto flex min-h-[70vh] max-w-6xl flex-col justify-center gap-6 px-4 py-20 sm:px-6">
           <p className="eyebrow text-cover-accent">{t('heroEyebrow')}</p>
           <div className="section-rule" aria-hidden="true" />
-          <h1 className="max-w-3xl text-4xl text-on-cover sm:text-6xl">{getText('hero_title') || t('brand')}</h1>
+          <h1 className="slogan-display max-w-3xl text-4xl text-on-cover sm:text-6xl">
+            {getText('hero_title') || t('brand')}
+          </h1>
           <p className="max-w-2xl text-lg leading-relaxed text-on-cover">{getText('hero_subtitle')}</p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <a href="/membership" className="btn-primary">
@@ -97,7 +102,7 @@ export function HomePage({ loaded }: { loaded: HomeData }) {
               <p className="eyebrow mb-2">{t('navEvents')}</p>
               <h2 className="text-3xl">{t('eventsPreviewTitle')}</h2>
             </div>
-            <a href="/events" className="btn-ghost">
+            <a href="/events" className="btn-ghost btn-gold-link">
               {t('eventsViewAll')}
               <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
             </a>
