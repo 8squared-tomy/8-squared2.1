@@ -82,19 +82,35 @@ export function SheetContent({
     if (!mounted) return;
     if (open) {
       setRendered(true);
-      const enter = window.setTimeout(() => {
-        setVisible(true);
-        const focusable = panel.current?.querySelector<HTMLElement>(
-          'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        );
-        focusable?.focus();
-      }, 20);
-      return () => window.clearTimeout(enter);
+      return;
     }
     setVisible(false);
     const exit = window.setTimeout(() => setRendered(false), 360);
     return () => window.clearTimeout(exit);
   }, [open, mounted]);
+
+  /**
+   * Flip to the open state only after the off-screen position has actually been
+   * painted. Two frames guarantee that paint; a plain timeout could be batched
+   * with the mount, which made the menu snap into place instead of sliding.
+   */
+  useEffect(() => {
+    if (!open || !rendered) return;
+    let inner = 0;
+    const outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => {
+        setVisible(true);
+        const focusable = panel.current?.querySelector<HTMLElement>(
+          'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        focusable?.focus();
+      });
+    });
+    return () => {
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
+  }, [open, rendered]);
 
   useEffect(() => {
     if (!open) return;

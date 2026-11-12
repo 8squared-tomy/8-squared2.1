@@ -67,6 +67,23 @@ try {
   const trigger = page.locator('button[aria-label*="menu" i], button[aria-label*="القائمة"], button:has-text("Menu")').first();
   notes.menuTrigger = await trigger.count();
   if (notes.menuTrigger > 0) {
+    // Sample the panel's transform on every frame around the click, so an actual
+    // slide is observed instead of one post-transition snapshot.
+    await page.evaluate(() => {
+      const samples = [];
+      window.__sheetSamples = samples;
+      const start = performance.now();
+      const tick = () => {
+        const el = document.querySelector('[role="dialog"]');
+        if (el) {
+          const style = getComputedStyle(el);
+          samples.push([Math.round(performance.now() - start), style.transform, Number(style.opacity)]);
+        }
+        if (performance.now() - start < 1400) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    });
+
     await trigger.click();
     const dialog = page.locator('[role="dialog"]').first();
     await dialog.waitFor({ state: 'visible', timeout: 10000 });
@@ -84,10 +101,15 @@ try {
       .first()
       .evaluate((el) => getComputedStyle(el).transitionDuration)
       .catch(() => null);
-    notes.sheetStartTransform = await dialog.evaluate((el) => getComputedStyle(el).transform);
-    await page.waitForTimeout(520);
-    notes.sheetSettledTransform = await dialog.evaluate((el) => getComputedStyle(el).transform);
-    notes.sheetSlidIn = notes.sheetStartTransform !== notes.sheetSettledTransform;
+    await page.waitForTimeout(900);
+
+    const samples = await page.evaluate(() => window.__sheetSamples ?? []);
+    const rest = (transform) => transform === 'none' || transform === 'matrix(1, 0, 0, 1, 0, 0)';
+    notes.sheetFrames = samples.length;
+    notes.sheetStartTransform = samples[0]?.[1] ?? null;
+    notes.sheetMidTransform = samples.find(([, transform]) => !rest(transform))?.[1] ?? null;
+    notes.sheetSettledTransform = samples.at(-1)?.[1] ?? null;
+    notes.sheetSlidIn = Boolean(notes.sheetMidTransform);
 
     if (!reducedMotion) {
       check(
@@ -99,8 +121,15 @@ try {
         `menu backdrop should fade, got transition-duration "${notes.backdropTransition}"`,
       );
       check(
-        notes.sheetSettledTransform === 'none' ||
-          notes.sheetSettledTransform === 'matrix(1, 0, 0, 1, 0, 0)',
+        notes.sheetFrames > 5,
+        `expected several frames while the menu opens, got ${notes.sheetFrames}`,
+      );
+      check(
+        notes.sheetSlidIn,
+        'menu panel never appeared mid-slide, so it still pops into place',
+      );
+      check(
+        rest(notes.sheetSettledTransform),
         `menu panel should settle in place, got "${notes.sheetSettledTransform}"`,
       );
     }
