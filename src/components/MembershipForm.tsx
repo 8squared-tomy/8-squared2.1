@@ -5,6 +5,7 @@ import { FormField, Notice } from '@/components/FormField';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import type { TranslationKey } from '@/i18n/translations';
 import { submitMembershipRequest } from '@/lib/publicApi';
+import { checkMembershipDuplicate } from '@/lib/membership.functions';
 import { LEVELS, TRAINING_TIMES, YEARS, normalizeEmail, validateMembership, type MembershipInput, type FieldErrors } from '@/lib/validation';
 import type { ChessLevel, TrainingTime, YearsPlaying } from '@/types/club';
 
@@ -61,9 +62,23 @@ export function MembershipForm() {
 
     setSubmitting(true);
     setServerError(null);
+
+    const fullName = `${form.firstName.trim()} ${form.lastName.trim()}`;
+    const email = normalizeEmail(form.email);
+
+    // Refuse a second application with the same name and email.
+    const existing = await checkMembershipDuplicate({ data: { fullName, email } }).catch(() => ({
+      duplicate: false,
+    }));
+    if (existing.duplicate) {
+      setSubmitting(false);
+      setServerError('errAlreadyApplied');
+      return;
+    }
+
     const outcome = await submitMembershipRequest({
-      fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
-      email: normalizeEmail(form.email),
+      fullName,
+      email,
       university: form.university.trim(),
       level: form.level as ChessLevel,
       yearsPlaying: form.yearsPlaying as YearsPlaying,
