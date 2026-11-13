@@ -67,7 +67,7 @@ export function MembershipForm() {
     const email = normalizeEmail(form.email);
 
     // Refuse a second application with the same name and email.
-    const existing = await checkMembershipDuplicate({ data: { fullName, email } }).catch(() => ({
+    const existing = await checkMembershipDuplicate({ data: { email } }).catch(() => ({
       duplicate: false,
     }));
     if (existing.duplicate) {

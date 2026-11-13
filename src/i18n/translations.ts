@@ -136,7 +136,7 @@ export const en = {
   errGeneric: 'Something went wrong. Please try again in a moment.',
   errRateLimited: 'Too many attempts from your connection. Please wait a few minutes and try again.',
   errAlreadyRegistered: 'You are already registered for this event.',
-  errAlreadyApplied: 'An application with this name and email has already been sent. Please wait for our reply.',
+  errAlreadyApplied: 'An application with this email has already been sent. Please wait for our reply.',
   errEventUnavailable: 'Registration for this event is not available.',
 
   eventsTitle: 'Events',
@@ -485,7 +485,7 @@ export const ar: Record<TranslationKey, string> = {
   errGeneric: 'حدث خطأ ما. يرجى المحاولة مرة أخرى بعد قليل.',
   errRateLimited: 'محاولات كثيرة من اتصالك. يرجى الانتظار بضع دقائق ثم المحاولة مرة أخرى.',
   errAlreadyRegistered: 'أنت مسجل في هذه الفعالية بالفعل.',
-  errAlreadyApplied: 'يوجد طلب مرسل مسبقاً بهذا الاسم والبريد الإلكتروني. يرجى انتظار ردّنا.',
+  errAlreadyApplied: 'يوجد طلب مرسل مسبقاً بهذا البريد الإلكتروني. لا يمكن إرسال طلب جديد بنفس الإيميل. يرجى انتظار ردّنا.',
   errEventUnavailable: 'التسجيل في هذه الفعالية غير متاح.',
 
   eventsTitle: 'الفعاليات',
